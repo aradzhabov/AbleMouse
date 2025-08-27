@@ -14,6 +14,7 @@ High-precision & affordable: the DIY (do it yourself) assistive solution
 | **Universal Accessibility** | Helps both completely immobile users and those with minimal motor skills. You can use our solution with just your tongue, even with total paralysis. |
 | **Wireless Freedom** | Full Bluetooth control without cables |
 | **Multi-Platform Support** | Works on Windows, macOS, and Android |
+| **Plug & Play Simplicity** | For Windows and macOS end-users: No additional software or drivers are required. Simply find and connect our device using your computer's standard Bluetooth settings—just like pairing a pair of wireless headphones. The moment it's connected, you can begin controlling your mouse.
 | **Ultra-Low Cost** | All components cost less than $10 USD |
 | **Open Source & hackable** | DIY. Assemble and customize it yourself in a garage, workshop, or makerspace. All instructions and code are openly available.
 
