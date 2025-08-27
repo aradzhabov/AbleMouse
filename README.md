@@ -38,9 +38,6 @@ We welcome contributions! Here's how you can help:
 > [English](/docs/en/assemble-guide.md) 
 
 ## Support
-
-- 🐛 [Report Issues](https://github.com/aradzhabov/AbleMouse/issues)
-- 💬 [Community Discussions](https://github.com/aradzhabov/AbleMouse/discussions)
 - 📧 Email: aradzhabov@gmail.com
 
 ## License
