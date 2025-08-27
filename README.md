@@ -31,12 +31,12 @@ High-precision & affordable: the DIY (do it yourself) assistive solution
 We welcome contributions! Here's how you can help:
 
 1. **Spread the Word** - Share with communities who might benefit
-2. **Improve Documentation** - Help make guides clearer and more accessible. Help translate README.md to make this project available to non-English speakers.
+2. **Improve Documentation** - Help make guides clearer and more accessible. Help translate to make this project available to non-English speakers.
 3. **Develop Features** - Implement new functionality or platform support
 4. **Test and Report** - Try building and report any issues
 
 ### Assembly Steps
-> [English](/docs/en/assemble-guide.md) 
+> [English](/docs/en/assemble-guide.md) | !!Help translate to make this project available to non-English!!
 
 ## Support
 - 📧 Email: aradzhabov@gmail.com
