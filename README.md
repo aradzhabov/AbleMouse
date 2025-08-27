@@ -1,11 +1,7 @@
 # AbleMouse
 
-*🚧 Page in progress — will complete it by the end of August 2025*
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-
-## **✨ Open-source alternative to** to commercial solutions like **MouthPad®**, **eye-trackers**, or even complex systems like **Neuralink**.
-> Control your mouse with just tongue movements or simple touches on fully customizable pedals with any available body part.
+## ✨ Open-source alternative to solutions like **MouthPad®**, **eye-trackers**, or even complex systems like **Neuralink**.
+> ❤️Control your mouse with just tongue movements or simple touches on fully customizable pedals with any available body part.
 High-precision & affordable: the DIY (do it yourself) assistive solution
 
 
@@ -13,11 +9,11 @@ High-precision & affordable: the DIY (do it yourself) assistive solution
 
 | Feature | Description |
 |---------|-------------|
-| **Universal Accessibility** | Helps both completely immobile users and those with minimal motor skills |
+| **Universal Accessibility** | Helps both completely immobile users and those with minimal motor skills. You can use our solution with just your tongue, even with total paralysis. |
 | **Wireless Freedom** | Full Bluetooth control without cables |
 | **Multi-Platform Support** | Works on Windows, macOS, and Android |
 | **Ultra-Low Cost** | All components cost less than $10 USD |
-| **Open Source & hackable** | Assemble and customize it yourself in a garage, workshop, or makerspace. All instructions and code are openly available. |
+| **Open Source & hackable** | DIY. Assemble and customize it yourself in a garage, workshop, or makerspace. All instructions and code are openly available.
 
 ## Who Is It For?
 
