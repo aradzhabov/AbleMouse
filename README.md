@@ -36,7 +36,7 @@ We welcome contributions! Here's how you can help:
 4. **Test and Report** - Try building and report any issues
 
 ### Assembly Steps
-> [English](/docs/en/assemble-guide.md) | !!Help translate to make this project available to non-English!!
+> [English](/docs/en/assemble-guide.md) | ✋Help translate to make this project available to non-English people✋
 
 ## Support
 - 📧 Email: aradzhabov@gmail.com
