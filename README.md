@@ -19,9 +19,10 @@ High-precision & affordable: the DIY (do it yourself) assistive solution
 | **No Expert Needed** | You don't need to be an IoT expert to build it. In fact, the setup is so simple that you can easily find a helper in your immediate circle—be it a colleague from the IT department, a tech-savvy friend, or a student. It's all based on simple copy-paste operations, so no deep knowledge is required from them either.
 
 ## Who Is It For?
-
-- People with **ALS** (Amyotrophic Lateral Sclerosis), spinal cord injuries, muscular dystrophy
+> This solution is designed for users who, for various reasons, are unable to operate a mouse effectively.
+- People with **ALS** (Amyotrophic Lateral Sclerosis), cerebral palsy, spinal cord injuries, muscular dystrophy
 - Those undergoing **rehabilitation after stroke**
+>...and for those who want to help.
 - **Parents, teachers, and activists** who want to provide affordable help
 - Anyone who believes **assistive technology should be a right, not a privilege**
 
