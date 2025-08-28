@@ -1,4 +1,5 @@
 # AbleMouse. Assemble Guide.
+> This guide will be updated as questions, ideas, or new implementations are contributed by the community.
 
 This guide will help you assemble a touch-controlled device
 
@@ -40,7 +41,7 @@ You will need to cut it in half lengthwise as ESP32 pins won't align perfectly.
 Example: [AliExpress link](https://www.aliexpress.com/item/1005007085965483.html)
 
 ##### Option 2: ESP32 Terminal Adapter 30pin
-![ESP32 Adapter](../img/esp32adapter.jpg)
+![ESP32 Adapter](../img/esp32_30_pin_adapter.jpg)
 
 Example: [AliExpress link](https://www.aliexpress.com/item/1005007171930314.html)
 
@@ -185,8 +186,4 @@ Example file: [`touch_minimal_plus_speed_control.ino`](../../src/touch_minimal_p
 
 You can implement your own control scheme using physical buttons instead of touch pins.
 
-## Support
-
-This guide will be updated as questions, ideas, or new implementations are contributed by the community.
-
-*Note: The links provided are examples. You can find components in your country.*
+> This guide will be updated as questions, ideas, or new implementations are contributed by the community.
