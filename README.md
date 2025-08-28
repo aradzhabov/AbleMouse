@@ -1,5 +1,3 @@
-🚧 Page in progress — will complete it by the end of August 2025
-
 # AbleMouse
 
 ## ✨ Open-source alternative to solutions like **MouthPad®**, **eye-trackers**, or even complex systems like **Neuralink**.
