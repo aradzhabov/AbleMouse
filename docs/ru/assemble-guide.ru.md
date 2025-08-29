@@ -69,7 +69,7 @@
 ## 3. Программирование и первичная проверка
 
 ### 3.1. Установка необходимого ПО
-
+>Чуть позже переведу текст по ссылкам, чтоб было доступно максимальному количеству людей
 1.  **Скачайте и установите Arduino IDE**: https://www.arduino.cc/en/software/
 2.  **Добавьте поддержку ESP32 в Arduino IDE**: следуйте официальной инструкции https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html
 3.  **Установите драйверы для CP210x**: скачайте и установите драйверы с официального сайта Silicon Labs https://www.silabs.com/software-and-tools/usb-to-uart-bridge-vcp-drivers (для Windows выберите "Universal Windows Driver").
@@ -86,7 +86,6 @@
         *   Убедитесь, что кабель передает данные.
         *   Если видите ошибку, связанную с `BleMouse.cpp` (например, `cannot convert 'std::string' to 'String'`), понизьте версию платформы (espressif) ESP32 в Arduino IDE до **2.0.17** (в менеджере плат)
         согласно этой инструкции https://forum.arduino.cc/t/ble-mouse-example-compilation-error/1265845
-
 3.  Откройте `Tools` -> `Serial Monitor`. Установите скорость (Baud Rate) `115200`.
 4.  Коснитесь пальцем провода, подключенного к пину `D4`. В мониторе порта должно появиться сообщение `Touch`. Это означает, что плата и сенсорные пины работают корректно.
 
