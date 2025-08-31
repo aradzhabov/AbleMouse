@@ -1,4 +1,7 @@
+
 # AbleMouse
+
+[//]: # (<img src="docs/img/icon_v2.png" alt="AbleMouse Demo" width="165"> )
 
 ## ✨ Open-source alternative to solutions like **MouthPad®**, **eye-trackers**, or even complex systems like **Neuralink**.
 > ❤️Control your mouse with just tongue movements or simple touches on fully customizable pedals with any available body part.
