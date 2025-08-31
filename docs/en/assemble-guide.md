@@ -151,7 +151,7 @@ Experiment with placement and mounting suitable for the individual user. Some re
 - Use foam for prototyping and experimenting
 - Avoid permanent fixation at first; allow for adjustments
 
->()You can cover the contact surface with a thin dielectric layer (0.1–0.3 mm), e.g. a common food-grade plastic bag. Note that not all dielectric materials transmit the electric field (this is distinct from electric current). The principle is kind of similar to how touchscreens work through a glass layer. But adjust the sensitivity threshold for your material — touches will be less sensitive.
+>Note: ESP32 touch pins are safe for human interaction because they use a low-power capacitive sensing method that detects changes in electrical capacitance, not direct electrical current. When you touch a connected conductive surface, your body's electrical charge alters the capacitance of the circuit, which the ESP32 reads, but there is no direct electrical connection or significant current flow through the pin to the user. But if you have any considerations you can cover the contact surface with a thin dielectric layer (0.1–0.3 mm), e.g. a common food-grade plastic bag. Note that not all dielectric materials transmit the electric field (this is distinct from electric current). The principle is kind of similar to how touchscreens work through a glass layer. But adjust the sensitivity threshold for your material — touches will be less sensitive. 
 
 ![Tongue Device](../img/me_linked_with_the_device.jpg)
 ![Tongue Perspective](../img/tongue_touch_perspective_view.jpg)
