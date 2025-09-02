@@ -9,7 +9,9 @@ High-precision & affordable: the DIY (do it yourself) assistive solution
 
 >▶️[Video AbleMouse](https://youtu.be/1eeg7Sakj_I)
 
+<a href="https://www.producthunt.com/products/ablemouse-control-with-tongue-or-touch?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-ablemouse" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1011143&theme=light&t=1756777068252" alt="AbleMouse - DIY&#0032;solution&#0032;that&#0032;helps&#0032;even&#0032;with&#0032;complete&#0032;paralysis | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 
+[//]: # (<iframe style="border: none;" src="https://cards.producthunt.com/cards/products/1103325" width="500" height="405" frameborder="0" scrolling="no" allowfullscreen></iframe>)
 ## Key Features
 
 | Feature | Description |
