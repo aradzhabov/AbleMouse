@@ -1,11 +1,16 @@
 
 # AbleMouse
 
+> English | [Chinese](README.cn.md) | [Russian](README.ru.md) | 🌍 Help us translate! Make the project global.
+
+
 [//]: # (<img src="docs/img/icon_v2.png" alt="AbleMouse Demo" width="165"> )
 
 ## ✨ Open-source alternative to solutions like **MouthPad®**, **eye-trackers**, or even complex systems like **Neuralink**.
 > ❤️Control your mouse with just tongue movements or simple touches on fully customizable pedals with any available body part.
 High-precision & affordable: the DIY (do it yourself) assistive solution
+
+> Our solution gives people with physical disabilities the power to go online — and in doing so, rediscover their self-worth, confidence, and dignity.
 
 >▶️[Video AbleMouse](https://youtu.be/1eeg7Sakj_I)
 
@@ -42,7 +47,7 @@ We welcome contributions! Here's how you can help:
 4. **Test and Report** - Try building and report any issues
 
 ### Assembly Steps
-> [English](docs/en/assemble-guide.md) | ✋Help translate to make this project available to non-English people✋
+> [English](docs/en/assemble-guide.md) | 🌍 Help us translate! Make the project global.
 
 ## Support
 - 📧 Email: aradzhabov@gmail.com
