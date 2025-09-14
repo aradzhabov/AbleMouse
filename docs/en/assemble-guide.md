@@ -112,7 +112,7 @@ In Arduino IDE, select "ESP32 Dev Module"
 ### 3.2 Test with Example Code
 
 #### 3.2.1 Touch Test
-Copy contents of [`touch_test_GPIO_4.ino`](../../src/touch_test_GPIO_4.ino) to a new sketch and upload.
+Copy contents of [`touch_test_GPIO_4.ino`](../../src/esp32/touch_test_GPIO_4.ino) to a new sketch and upload.
 If you encounter errors:
 > **Troubleshooting:**
 > - **Upload fails?** Ensure the USB cable supports data transfer.
@@ -130,7 +130,7 @@ If so, the touch sensing is working.
 
 
 #### 3.2.2 Minimal Touch Example
-Copy contents of [`touch_minimal.ino`](../../src/touch_minimal.ino) to a new sketch and upload.
+Copy contents of [`touch_minimal.ino`](../../src/esp32/touch_minimal.ino) to a new sketch and upload.
 
 Open Serial Monitor at 115200 baud rate. Touch the connected wires to see corresponding messages.
 
@@ -184,7 +184,7 @@ Experiment with placement and mounting suitable for the individual user. Some re
 ## Advanced Options
 
 ### 6.1 Speed Control Without Reprogramming
-Example file: [`touch_minimal_plus_speed_control.ino`](../../src/touch_minimal_plus_speed_control.ino)
+Example file: [`touch_minimal_plus_speed_control.ino`](../../src/esp32/touch_minimal_plus_speed_control.ino)
 
 You can implement your own control scheme using physical buttons instead of touch pins.
 
