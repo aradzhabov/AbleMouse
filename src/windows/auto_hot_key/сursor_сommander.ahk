@@ -52,10 +52,10 @@ WatchGesture() {
         
         ; Обновляем последнюю позицию и время
         lastX := currentX
-        lastY := currentY
+    lastY := currentY
         lastMoveTime := currentTime
     }
-    
+
     ; Сбрасываем жест если время вышло
     if (gestureStep > 0 && (currentTime - lastMoveTime) > gestureTimeWindow) {
         gestureStep := 0
@@ -71,51 +71,47 @@ ShowFeedback(message) {
 
 ShowQuickPanel() {
     global menuTimeout
-    
+
     ; Получаем позицию мыши
     MouseGetPos(&x, &y)
-    
+
     ; Создаем GUI окно
     myGui := Gui("+AlwaysOnTop +ToolWindow -Caption +Border", "QuickPanel")
     myGui.BackColor := "F0F0F0"
     myGui.SetFont("s10")
-    
+
     ; Добавляем кнопки действий
-    ; myGui.Add("Button", "x10 y10 w100 h30", "Копировать").OnEvent("Click", (*) => MenuAction("copy", myGui))
-    ; myGui.Add("Button", "x10 y50 w100 h30", "Вставить").OnEvent("Click", (*) => MenuAction("paste", myGui))
-    ; myGui.Add("Button", "x10 y90 w100 h30", "Вырезать").OnEvent("Click", (*) => MenuAction("cut", myGui))
-    ; myGui.Add("Button", "x10 y130 w100 h30", "Закрыть").OnEvent("Click", (*) => MenuAction("close", myGui))
     myGui.Add("Button", "x10 y10 w100 h30", "osk").OnEvent("Click", (*) => MenuAction("osk", myGui))
     myGui.Add("Button", "x10 y50 w100 h30", "mouse jump").OnEvent("Click", (*) => MenuAction("mouse_jump", myGui))
     myGui.Add("Button", "x10 y90 w100 h30", "crosshair").OnEvent("Click", (*) => MenuAction("crosshair", myGui))
     myGui.Add("Button", "x10 y130 w100 h30", "Отмена").OnEvent("Click", (*) => DestroyMenu(myGui))
-    
-    
+
+
     ; Добавляем таймер обратного отсчета
     timeLeft := 3
     timerText := myGui.Add("Text", "x10 y205 w100 h20 Center cGray", "Закроется через " timeLeft "s")
-    
+
     ; Показываем окно рядом с курсором
     panelX := x - 60
     panelY := y - 85
     myGui.Show("x" panelX " y" panelY " w120 h230")
-    
+
     ; Запускаем таймер обратного отсчета
     timer := SetTimer(updateTimer, 1000)
-    
+
     updateTimer() {
         timeLeft--
-        
+
         if (timeLeft <= 0) {
             DestroyMenu(myGui)
             return
         }
-        
+
         ; Обновляем текст таймера
         try {
             if (WinExist(myGui.Hwnd)) {
                 timerText.Text := "Закроется через " timeLeft "s"
-                
+
                 ; Меняем цвет при малом времени
                 if (timeLeft <= 2) {
                     timerText.Opt("cRed")
@@ -127,23 +123,49 @@ ShowQuickPanel() {
             }
         }
     }
-    
+
     ; Устанавливаем таймер закрытия меню
     SetTimer(() => DestroyMenu(myGui), -menuTimeout)
 }
 
 MenuAction(action, myGui) {
     switch action {
-        case "copy": Send "^c"
-        case "paste": Send "^v"
-        case "cut": Send "^x"
-        case "close": Send "!{F4}"
-	case "osk": Send "#^o" ; Windows+Ctrl+O
-	case "mouse_jump": Send "#+d" ; Windows+Shift+D
-	case "crosshair": Send "#!p" ; Windows+Alt+P
+        case "osk":
+            Send "#^o" ; Windows+Ctrl+O
+            ; Ждем появления экранной клавиатуры и перемещаем курсор в её центр
+            SetTimer MoveCursorToOSK, -1000
+        case "mouse_jump":
+            Send "#+d" ; Windows+Shift+D
+        case "crosshair":
+            Send "#!p" ; Windows+Alt+P
     }
-    
+
     DestroyMenu(myGui)
+}
+
+; Функция для перемещения курсора в центр экранной клавиатуры
+MoveCursorToOSK() {
+    ; Ждем появления экранной клавиатуры
+    WinWait "ahk_exe osk.exe",, 3
+
+    if WinExist("ahk_exe osk.exe") {
+        ; Получаем позицию и размеры экранной клавиатуры
+        WinGetPos(&oskX, &oskY, &oskWidth, &oskHeight, "ahk_exe osk.exe")
+
+        ; Вычисляем центр окна
+        centerX := oskX + oskWidth // 2
+        centerY := oskY + oskHeight // 2
+
+        ; Перемещаем курсор в центр экранной клавиатуры
+        MouseMove centerX, centerY, 0
+
+        ; Визуальная обратная связь
+        ToolTip "Курсор перемещен в центр клавиатуры", centerX, centerY + 30
+        SetTimer () => ToolTip(), -1500
+    } else {
+        ToolTip "Экранная клавиатура не найдена"
+        SetTimer () => ToolTip(), -1500
+    }
 }
 
 DestroyMenu(myGui) {
