@@ -8,7 +8,6 @@ gestureTimeWindow := 1000  ; Gesture time window in milliseconds
 minDistance := 50          ; Minimum movement distance in pixels
 maxPause := 300            ; Maximum pause between movements
 menuTimeout := 3000        ; Menu close timeout after 3 seconds
-countdownTime := 3         ; Countdown time in seconds
 
 ; Hotkey settings
 oskToggleHotkey := "#^o"   ; Windows+Ctrl+O - toggles OSK visibility
@@ -76,7 +75,7 @@ ShowFeedback(message) {
 }
 
 ShowQuickPanel() {
-    global menuTimeout, countdownTime
+    global menuTimeout
 
     ; Get mouse position
     MouseGetPos(&x, &y)
@@ -99,6 +98,7 @@ ShowQuickPanel() {
 
 
     ; Add countdown timer
+    countdownTime := menuTimeout // 1000  ; Convert milliseconds to seconds
     timeLeft := countdownTime
     timerText := myGui.Add("Text", "x10 y205 w100 h20 Center cGray", "Closes in " timeLeft "s")
 
@@ -241,7 +241,7 @@ Pause:: {
 
 ; Information panel Ctrl+Alt+I
 ^!i:: {
-    global minDistance, gestureTimeWindow, menuTimeout, countdownTime
+    global minDistance, gestureTimeWindow, menuTimeout
     global oskToggleHotkey, mouseJumpHotkey, crosshairHotkey
 
     MsgBox(

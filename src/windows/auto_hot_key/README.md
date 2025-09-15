@@ -30,7 +30,6 @@ gestureTimeWindow := 1000  ; Gesture time window in milliseconds
 minDistance := 50          ; Minimum movement distance in pixels
 maxPause := 300            ; Maximum pause between movements
 menuTimeout := 3000        ; Menu close timeout after 3 seconds
-countdownTime := 3         ; Countdown time in seconds before the panel disappears.
 ```
 
 ### Hotkey Settings
@@ -40,8 +39,9 @@ mouseJumpHotkey := "#+d"   ; Windows+Shift+D
 crosshairHotkey := "#!p"   ; Windows+Alt+P
 ```
 
-## Installation
+## Installation (tested with AutoHotkey v2.0 and PowerToys 0.94)
 1. Install [AutoHotkey v2.0](https://www.autohotkey.com/)
+2. Install [PowerToys 0.94](https://github.com/microsoft/PowerToys/releases/tag/v0.94.0)
 2. Save the script with `.ahk` extension
 3. Run the script
 
@@ -55,8 +55,8 @@ crosshairHotkey := "#!p"   ; Windows+Alt+P
 ### Quick Panel Options
 - **osk hide/show**: Toggle on-screen keyboard visibility
 - **osk to cursor**: Move OSK to cursor position and focus it
-- **mouse jump**: Show desktop (Windows+Shift+D)
-- **crosshair**: Toggle crosshair overlay (Windows+Alt+P)
+- **mouse jump**: Jump the mouse pointer quickly to anywhere on your desktop.
+- **crosshair**: Toggle crosshair overlay
 - **Cancel**: Close the menu
 
 ### Additional Controls
@@ -90,10 +90,6 @@ Modify the configuration section to:
 - Customize hotkey combinations
 - Add new menu options and corresponding functions
 
-## Requirements
-- AutoHotkey v2.0 or later
-- Windows operating system
-- On-screen keyboard (osk.exe) for keyboard-related functions
 
 ## Notes
 - The script automatically detects if OSK is already running
