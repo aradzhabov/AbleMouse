@@ -13,7 +13,7 @@ A gesture-based automation script that recognizes mouse gestures (Left → Right
 ![Screenshot](./media/mouse_commander_screenshot.png)
 
 ## Source
-[mouse_commander.ahk](./cursor_commander.ahk)
+[mouse_commander.ahk](./mouse_сommander.ahk)
 
 ## Features
 - Mouse gesture recognition (Left → Right movement)
