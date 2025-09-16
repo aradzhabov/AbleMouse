@@ -6,7 +6,7 @@ This approach can be easily extended with additional functions as needed.
 > Below is a detailed working example of a script. Using this as a foundation, you can design a custom gesture and a personalized set of available commands that best suit your needs.
 
 ## Overview
->▶️[Video AbleMouse](https://youtu.be/VQCHKfXjh-w)
+>▶️[demo](https://youtu.be/VQCHKfXjh-w)
 > 
 A gesture-based automation script that recognizes mouse gestures (Left → Right) as an example to display a quick access panel with various system functions.
 
