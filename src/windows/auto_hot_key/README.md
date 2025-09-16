@@ -6,7 +6,9 @@ This approach can be easily extended with additional functions as needed.
 > Below is a detailed working example of a script. Using this as a foundation, you can design a custom gesture and a personalized set of available commands that best suit your needs.
 
 ## Overview
-A gesture-based automation script that recognizes mouse gestures (Left → Right) to display a quick access panel with various system functions.
+>▶️[Video AbleMouse](https://youtu.be/VQCHKfXjh-w)
+> 
+A gesture-based automation script that recognizes mouse gestures (Left → Right) as an example to display a quick access panel with various system functions.
 
 
 
@@ -18,9 +20,11 @@ A gesture-based automation script that recognizes mouse gestures (Left → Right
 ## Features
 - Mouse gesture recognition (Left → Right movement)
 - Quick access panel with customizable actions
-- On-screen keyboard control
-- Visual feedback system
-- Configurable hotkeys and timing settings
+- osk hide/show: Toggle on-screen keyboard visibility
+- osk to cursor: Move OSK to cursor position and focus it
+- mouse jump: Jump the mouse pointer quickly to anywhere on your desktop.
+- crosshair: Toggle crosshair overlay
+- you can add new features by yourself
 
 ## Configuration Settings
 
