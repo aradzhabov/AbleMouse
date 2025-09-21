@@ -4,8 +4,8 @@ SendMode "Input"
 SetWorkingDir A_ScriptDir
 
 ; Gesture settings
-gestureTimeWindow := 1000  ; Gesture time window in milliseconds
-minDistance := 50          ; Minimum movement distance in pixels
+gestureTimeWindow := 350  ; Gesture time window in milliseconds
+minDistance := 100          ; Minimum movement distance in pixels
 maxPause := 300            ; Maximum pause between movements
 menuTimeout := 3000        ; Menu close timeout after 3 seconds
 
@@ -13,6 +13,7 @@ menuTimeout := 3000        ; Menu close timeout after 3 seconds
 oskToggleHotkey := "#^o"   ; Windows+Ctrl+O - toggles OSK visibility
 mouseJumpHotkey := "#+d"   ; Windows+Shift+D
 crosshairHotkey := "#!p"   ; Windows+Alt+P
+zoomHotKey := "^1"         ; Ctrl+1
 
 ; Variables for gesture tracking
 lastX := 0
@@ -94,7 +95,9 @@ ShowQuickPanel() {
     myGui.Add("Button", "x10 y50 w100 h30", " ️➤ to ⌨️osk").OnEvent("Click", (*) => MenuAction("osk_to_cursor", myGui))
     myGui.Add("Button", "x10 y90 w100 h30", "🖥️ mouse jump").OnEvent("Click", (*) => MenuAction("mouse_jump", myGui))
     myGui.Add("Button", "x10 y130 w100 h30", "🎯 crosshair").OnEvent("Click", (*) => MenuAction("crosshair", myGui))
-    myGui.Add("Button", "x10 y170 w100 h30", "❌ сancel").OnEvent("Click", (*) => DestroyMenu(myGui))
+    ; myGui.Add("Button", "x10 y170 w100 h30", "❌ сancel").OnEvent("Click", (*) => DestroyMenu(myGui))
+    myGui.Add("Button", "x10 y170 w100 h30", "🔍 zoom").OnEvent("Click", (*) => MenuAction("zoom", myGui))
+
 
 
     ; Add countdown timer
@@ -151,6 +154,8 @@ MenuAction(action, myGui) {
             Send mouseJumpHotkey
         case "crosshair":
             Send crosshairHotkey
+        case "zoom":
+            Send zoomHotKey
     }
 
     DestroyMenu(myGui)
