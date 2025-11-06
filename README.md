@@ -14,20 +14,20 @@ High-precision & affordable: the DIY (do it yourself) assistive solution
 
 >▶️[Video AbleMouse](https://youtu.be/1eeg7Sakj_I)
 
->[AbleMouse was selected by the Product Hunt editors and received the "Featured" status. This is a significant honor. It means the world to me that people voted with their hearts.](https://www.producthunt.com/products/ablemouse-control-with-tongue-or-touch?launch=ablemouse)
+>[AbleMouse was selected by the ✨Product Hunt (PH) editors and received the "Featured" status. This is a significant honor. It means the world to me that people voted with their hearts.](https://www.producthunt.com/products/ablemouse-control-with-tongue-or-touch?launch=ablemouse)
 
 ## Key Features
 
-| Feature | Description |
-|---------|-------------|
-| **Universal Accessibility** | Helps both completely immobile users and those with minimal motor skills. You can use our solution with just your tongue, even with total paralysis. |
-| **Wireless Freedom** | Full Bluetooth control without cables |
-| **Multi-Platform Support** | Works on Windows, macOS, and Android |
-| **Plug & Play Simplicity** | For Windows and macOS end-users: No additional software or drivers are required. Simply find and connect our device using your computer's standard Bluetooth settings—just like pairing a pair of wireless headphones. The moment it's connected, you can begin controlling your mouse.
-| **Ultra-Low Cost** | All components cost less than $10 USD |
-| **Short Learning Curve** | The adaptation was startlingly fast—within 20 minutes, my control was precise and confident |
-| **Open Source & hackable** | DIY. Assemble and customize it yourself in a garage, workshop, or makerspace. All instructions and code are openly available.
-| **No Expert Needed** | You don't need to be an IoT expert to build it. In fact, the setup is so simple that you can easily find a helper in your immediate circle—be it a colleague from the IT department, a tech-savvy friend, or a student. It's all based on simple copy-paste operations, so no deep knowledge is required from them either.
+| Feature | Description                                                                                                                                                                                                                                                                                                                |
+|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Universal Accessibility** | Helps both completely immobile users and those with minimal motor skills. You can use our solution with just your tongue, even with total paralysis.                                                                                                                                                                       |
+| **Wireless Freedom** | Full Bluetooth control without cables                                                                                                                                                                                                                                                                                      |
+| **Multi-Platform Support** | Works on Windows, macOS, iOS, iPadOS, unix(Ubuntu) and Android                                                                                                                                                                                                                                                             |
+| **Plug & Play Simplicity** | For Windows and macOS end-users: No additional software or drivers are required. Simply find and connect our device using your computer's standard Bluetooth settings—just like pairing a pair of wireless headphones. The moment it's connected, you can begin controlling your mouse.                                    
+| **Ultra-Low Cost** | All components cost less than $10 USD                                                                                                                                                                                                                                                                                      |
+| **Short Learning Curve** | The adaptation was startlingly fast—within 20 minutes, my control was precise and confident                                                                                                                                                                                                                                |
+| **Open Source & hackable** | DIY. Assemble and customize it yourself in a garage, workshop, or makerspace. All instructions and code are openly available.                                                                                                                                                                                              
+| **No Expert Needed** | You don't need to be an IoT expert to build it. In fact, the setup is so simple that you can easily find a helper in your immediate circle—be it a colleague from the IT department, a tech-savvy friend, or a student. It's all based on simple copy-paste operations, so no deep knowledge is required from them either. 
 
 ## Who Is It For?
 > This solution is designed for users who, for various reasons, are unable to operate a mouse effectively.
