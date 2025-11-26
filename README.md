@@ -19,7 +19,7 @@ High-precision & affordable: the DIY (do it yourself) assistive solution
 ## News  (November 27, 2025)
 AbleMouse expands support to Unix, iOS, & iPadOS, making it compatible with all major OSes.
 [A new 3D-printable case for the ESP32 board is available.](https://github.com/aradzhabov/AbleMouse/tree/main/3d_printer/models/esp32_box/variations/1)
-The project also introduces [MouseCommander](https://github.com/aradzhabov/AbleMouse/blob/main/src/windows/auto_hot_key/README.md), a new open-source component. It solves a key problem: how to use keyboard shortcuts and system tools without a physical keyboard or standart mouse. It opens a customizable menu via a gesture, enabling features like instant cursor "teleportation" via a screen preview, an on-screen keyboard and more.
+The project also introduces [MouseCommander (win)](https://github.com/aradzhabov/AbleMouse/blob/main/src/windows/auto_hot_key/README.md), a new open-source component. It solves a key problem: how to use keyboard shortcuts and system tools without a physical keyboard or standart mouse. It opens a customizable menu via a gesture, enabling features like instant cursor "teleportation" via a screen preview, an on-screen keyboard and more.
 
 ## Key Features
 
