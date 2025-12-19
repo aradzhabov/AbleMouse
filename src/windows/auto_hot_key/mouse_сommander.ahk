@@ -9,6 +9,9 @@ minDistance := 100          ; Minimum movement distance in pixels
 maxPause := 300            ; Maximum pause between movements
 menuTimeout := 3000        ; Menu close timeout after 3 seconds
 
+; Menu settings
+menuItemHeight := 45       ; Высота пункта меню (было 30, увеличение в 1.5 раза)
+
 ; Hotkey settings
 oskToggleHotkey := "#^o"   ; Windows+Ctrl+O - toggles OSK visibility
 mouseJumpHotkey := "#+d"   ; Windows+Shift+D
@@ -76,7 +79,7 @@ ShowFeedback(message) {
 }
 
 ShowQuickPanel() {
-    global menuTimeout
+    global menuTimeout, menuItemHeight
 
     ; Get mouse position
     MouseGetPos(&x, &y)
@@ -90,25 +93,39 @@ ShowQuickPanel() {
     isOSKVisible := WinExist("ahk_exe osk.exe")
     oskButtonText := isOSKVisible ? "⌨️ osk hide" : "⌨️ osk show"
 
-    ; Add action buttons
-    myGui.Add("Button", "x10 y10 w100 h30", oskButtonText).OnEvent("Click", (*) => MenuAction("osk_toggle", myGui))
-    myGui.Add("Button", "x10 y50 w100 h30", " ️➤ to ⌨️osk").OnEvent("Click", (*) => MenuAction("osk_to_cursor", myGui))
-    myGui.Add("Button", "x10 y90 w100 h30", "🖥️ mouse jump").OnEvent("Click", (*) => MenuAction("mouse_jump", myGui))
-    myGui.Add("Button", "x10 y130 w100 h30", "🎯 crosshair").OnEvent("Click", (*) => MenuAction("crosshair", myGui))
-    ; myGui.Add("Button", "x10 y170 w100 h30", "❌ сancel").OnEvent("Click", (*) => DestroyMenu(myGui))
-    myGui.Add("Button", "x10 y170 w100 h30", "🔍 zoom").OnEvent("Click", (*) => MenuAction("zoom", myGui))
+    ; Calculate button positions
+    buttonWidth := 100
+    buttonSpacing := 10
+    yPos := 10
 
+    ; Add action buttons with increased height
+    myGui.Add("Button", "x" buttonSpacing " y" yPos " w" buttonWidth " h" menuItemHeight, oskButtonText).OnEvent("Click", (*) => MenuAction("osk_toggle", myGui))
+    yPos += menuItemHeight + buttonSpacing
 
+    myGui.Add("Button", "x" buttonSpacing " y" yPos " w" buttonWidth " h" menuItemHeight, " ️➤ to ⌨️osk").OnEvent("Click", (*) => MenuAction("osk_to_cursor", myGui))
+    yPos += menuItemHeight + buttonSpacing
+
+    myGui.Add("Button", "x" buttonSpacing " y" yPos " w" buttonWidth " h" menuItemHeight, "🖥️ mouse jump").OnEvent("Click", (*) => MenuAction("mouse_jump", myGui))
+    yPos += menuItemHeight + buttonSpacing
+
+    myGui.Add("Button", "x" buttonSpacing " y" yPos " w" buttonWidth " h" menuItemHeight, "🎯 crosshair").OnEvent("Click", (*) => MenuAction("crosshair", myGui))
+    yPos += menuItemHeight + buttonSpacing
+
+    myGui.Add("Button", "x" buttonSpacing " y" yPos " w" buttonWidth " h" menuItemHeight, "🔍 zoom").OnEvent("Click", (*) => MenuAction("zoom", myGui))
+    yPos += menuItemHeight + buttonSpacing
+
+    ; Calculate window height based on menu items
+    totalHeight := yPos + 30  ; Add space for timer text
 
     ; Add countdown timer
     countdownTime := menuTimeout // 1000  ; Convert milliseconds to seconds
     timeLeft := countdownTime
-    timerText := myGui.Add("Text", "x10 y205 w100 h20 Center cGray", "Closes in " timeLeft "s")
+    timerText := myGui.Add("Text", "x10 y" yPos " w" buttonWidth " h25 Center cGray", "Closes in " timeLeft "s")
 
     ; Show window near cursor
     panelX := x - 60
     panelY := y - 85
-    myGui.Show("x" panelX " y" panelY " w120 h250")
+    myGui.Show("x" panelX " y" panelY " w" (buttonWidth + 2*buttonSpacing) " h" totalHeight)
 
     ; Start countdown timer
     timer := SetTimer(updateTimer, 1000)
@@ -243,10 +260,9 @@ Pause:: {
     SetTimer () => ToolTip(), -1500
 }
 
-
 ; Information panel Ctrl+Alt+I
 ^!i:: {
-    global minDistance, gestureTimeWindow, menuTimeout
+    global minDistance, gestureTimeWindow, menuTimeout, menuItemHeight
     global oskToggleHotkey, mouseJumpHotkey, crosshairHotkey
 
     MsgBox(
@@ -255,7 +271,8 @@ Pause:: {
         "1. Make a LEFT mouse movement (> " minDistance "px)`n" .
         "2. Then immediately a RIGHT movement (> " minDistance "px)`n" .
         "3. The entire gesture must take < " gestureTimeWindow "ms`n" .
-        "4. Menu will close automatically after " (menuTimeout//1000) " seconds`n`n"
+        "4. Menu will close automatically after " (menuTimeout//1000) " seconds`n" .
+        "5. Menu item height: " menuItemHeight "px`n`n"
     )
 }
 
