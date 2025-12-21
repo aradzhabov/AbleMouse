@@ -18,7 +18,7 @@
 > 
    > 🔥December 2025 - [AbleMouse AI Edition](AbleMouse_AI_edition.md)  is introduced. Cursor control using computer vision!
 > 
-   > November 2025 - [MouseCommander (win)](https://github.com/aradzhabov/AbleMouse/blob/main/src/windows/auto_hot_key/README.md) is introduced. Mouse Gesture-Controlled Quick Actions.
+   > November 2025 - [MouseCommander (win)](https://github.com/aradzhabov/AbleMouse/blob/main/src/windows/auto_hot_key/README.md) is introduced. Mouse Gesture-Controlled Quick Actions. +  [A new 3D-printable case for the ESP32 board is available](https://github.com/aradzhabov/AbleMouse/blob/main/AbleMouseDIY.md#news--november-27-2025)
 > 
    > September 2025 - [AbleMouse DIY Edition](AbleMouseDIY.md) is introduced. Control your mouse with just tongue movements or simple touches on fully customizable pedals with any available body part. 
 > 
