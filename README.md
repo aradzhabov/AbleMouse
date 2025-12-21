@@ -8,7 +8,7 @@
 ## ✨ Open-source alternative to solutions like **MouthPad**, **eye-trackers**, or even complex systems like **Neuralink**.
 ### 🚀 [News]
 >
-   > AbleMouse now consists of several sub-products designed to assist users [based on their individual physical abilities](#Product).
+   > AbleMouse now consists of several sub-products designed to assist users [based on their individual physical abilities](#product-compatibility-with-user-physical-abilities).
 > 
    > December 2025 - [AbleMouse AI Edition](AbleMouse_AI_edition.md)  is introduced. Cursor control using computer vision!
 > 
