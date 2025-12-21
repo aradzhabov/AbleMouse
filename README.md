@@ -3,16 +3,27 @@
 
 > English | [Chinese](README.cn.md) | [Russian](README.ru.md) | 🌍 Help us translate! Make the project global.
 
-
 [//]: # (<img src="docs/img/icon_v2.png" alt="AbleMouse Demo" width="165"> )
 
 ## ✨ Open-source alternative to solutions like **MouthPad**, **eye-trackers**, or even complex systems like **Neuralink**.
+### 🚀 [News]
+>
+   > AbleMouse now consists of several sub-products designed to assist users [based on their individual physical abilities](#Product).
+> 
+   > December 2025 - [AbleMouse AI Edition](AbleMouse_AI_edition.md)  is introduced. Cursor control using computer vision!
+> 
+   > November 2025 - [MouseCommander (win)](https://github.com/aradzhabov/AbleMouse/blob/main/src/windows/auto_hot_key/README.md) is introduced. Mouse Gesture-Controlled Quick Actions.
+> 
+   > September 2025 - [AbleMouse DIY Edition](AbleMouseDIY.md) is introduced. Control your mouse with just tongue movements or simple touches on fully customizable pedals with any available body part. 
+> 
+---
 
 > ❤️Our solution gives people with physical disabilities the power to go online — and in doing so, rediscover their self-worth, confidence, and dignity.
 
 > [AbleMouse was selected by the ✨Product Hunt (PH) editors and received the "Featured" status. This is a significant honor. It means the world to me that people voted with their hearts.](https://www.producthunt.com/products/ablemouse-control-with-tongue-or-touch/launches)
 
-# AbleMouse Product Compatibility with User Physical Abilities
+# Product Compatibility with User Physical Abilities
+
 > 🛈 AbleMouse now consists of several sub-products designed to assist users based on their individual physical abilities. Below is a table to help you navigate the available options and find the most suitable one for your needs. Each product name includes a link to its dedicated page with detailed information.
 
 | User's Physical Challenge                                | Usable Body Part(s)                                                    | Recommended Product                                                                                                                                          | Release Status           | Compatible Operating Systems                                                      |
