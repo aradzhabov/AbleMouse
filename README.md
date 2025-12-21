@@ -6,11 +6,17 @@
 [//]: # (<img src="docs/img/icon_v2.png" alt="AbleMouse Demo" width="165"> )
 
 ## ✨ Open-source alternative to solutions like **MouthPad**, **eye-trackers**, or even complex systems like **Neuralink**.
+
+> ❤️Our solution gives people with physical disabilities the power to go online — and in doing so, rediscover their self-worth, confidence, and dignity.
+
+> [AbleMouse was selected by the ✨Product Hunt (PH) editors and received the "Featured" status. This is a significant honor. It means the world to me that people voted with their hearts.](https://www.producthunt.com/products/ablemouse-control-with-tongue-or-touch/launches)
+
+
 ### 🚀 [News]
 >
    > AbleMouse now consists of several sub-products designed to assist users [based on their individual physical abilities](#product-compatibility-with-user-physical-abilities).
 > 
-   > December 2025 - [AbleMouse AI Edition](AbleMouse_AI_edition.md)  is introduced. Cursor control using computer vision!
+   > 🔥December 2025 - [AbleMouse AI Edition](AbleMouse_AI_edition.md)  is introduced. Cursor control using computer vision!
 > 
    > November 2025 - [MouseCommander (win)](https://github.com/aradzhabov/AbleMouse/blob/main/src/windows/auto_hot_key/README.md) is introduced. Mouse Gesture-Controlled Quick Actions.
 > 
@@ -18,9 +24,6 @@
 > 
 ---
 
-> ❤️Our solution gives people with physical disabilities the power to go online — and in doing so, rediscover their self-worth, confidence, and dignity.
-
-> [AbleMouse was selected by the ✨Product Hunt (PH) editors and received the "Featured" status. This is a significant honor. It means the world to me that people voted with their hearts.](https://www.producthunt.com/products/ablemouse-control-with-tongue-or-touch/launches)
 
 # Product Compatibility with User Physical Abilities
 
