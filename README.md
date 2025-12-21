@@ -16,7 +16,7 @@
 >
    > AbleMouse now consists of several sub-products designed to assist users [based on their individual physical abilities](#product-compatibility-with-user-physical-abilities).
 > 
-   > 🔥December 2025 - [AbleMouse AI Edition](AbleMouse_AI_edition.md)  is introduced. Cursor control using computer vision!
+   > December 2025 - 🔥[AbleMouse AI Edition](AbleMouse_AI_edition.md)  is introduced. Cursor control using computer vision!
 > 
    > November 2025 - [MouseCommander (win)](https://github.com/aradzhabov/AbleMouse/blob/main/src/windows/auto_hot_key/README.md) is introduced. Mouse Gesture-Controlled Quick Actions. +  [A new 3D-printable case for the ESP32 board is available](https://github.com/aradzhabov/AbleMouse/blob/main/AbleMouseDIY.md#news--november-27-2025)
 > 
