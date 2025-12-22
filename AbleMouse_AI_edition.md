@@ -1,11 +1,13 @@
 # AbleMouse AI edition
 
 > ❤️Control the mouse pointer using your face.
-The code works under both Windows and Mac Os.
+> 
+> The code works under both Windows and Mac Os. Note: Unix/Ubuntu support possible — requires testing
 
 >▶️[Video AbleMouse AI edition](https://youtu.be/AlqSVKt535Y)
 > / [Source Code](src/ablemouse_ai_edition/able_mouse_ai_edition.py) / ▶️[initial setup](https://youtu.be/KCn4GMMQkxc)
-> / Note: In the video demonstration for calling the on-screen keyboard in Windows, I used gesture recognition via [MouseCommander (win)](https://github.com/aradzhabov/AbleMouse/blob/main/src/windows/auto_hot_key/README.md) , which is also part of the AbleMouse project.
+> 
+> Note: In the video demonstration for calling the on-screen keyboard in Windows, I used gesture recognition via [MouseCommander (win)](https://github.com/aradzhabov/AbleMouse/blob/main/src/windows/auto_hot_key/README.md) , which is also part of the AbleMouse project. <br> On macOS, there is no need to use MouseCommander, as the built-in keyboard with the "dwelling" setting enabled and customizable transparency levels is both convenient and does not clutter the interface with its presence.
 
 <img src="docs/img/ablemouse_ai_icon.jpg" alt="AbleMouse AI edition" style="width: 250px; border: 2px solid #ccc; border-radius: 10px;" />
 
