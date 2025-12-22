@@ -12,7 +12,10 @@ The code works under both Windows and Mac Os.
 
 An important aspect is that the solution is fully open-source and can be easily adapted to meet the needs of a specific individual.
 
-To use AbleMouse AI edition, it is enough that you can turn and tilt your head, and use your eyes and mouth. The mouse pointer is positioned based on the direction of your nose, allowing you to work effectively even with very large screens. macOS and Windows do not have such a solution built-in.
+To use AbleMouse AI edition, it is enough that you can turn and tilt your head, and use your eyes and mouth. 
+The mouse pointer is positioned based on the direction of your nose, allowing you to work effectively even with very large screens.
+macOS and Windows do not have such a solution built-in.
+Another very important difference from other solutions is that your eyes remain free, as the tracking is based on the direction of your nose. This provides a much more natural feeling for us as humans. For example, solutions that require you to look at the point where you want to move the cursor demand significantly more effort and feel unnatural. An ordinary person using a hand-operated mouse can look anywhere—AbleMouse allows you to do the same.
 
 A few notes on use and configuration:
 
