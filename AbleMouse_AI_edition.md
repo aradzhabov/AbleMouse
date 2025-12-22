@@ -32,7 +32,7 @@ It is important to understand that these parameters greatly depend on the distan
 
 *   For Python developers: To run the program, you will need to create a virtual environment (venv) and install just 3 packages:
     `opencv-python`, `mediapipe`, `pyautogui`
-    After that, run [able_mouse_ai_edition.py](src/ablemouse_ai_edition/able_mouse_ai_edition.py).
+    After that, run [able_mouse_ai_edition.py](src/ablemouse_ai_edition/able_mouse_ai_edition.py). !!After launching, don't forget to properly [calibrate the camera position](https://youtu.be/KCn4GMMQkxc)!!
 
 *   Overall, I also see the program as an educational moment. I think many students will be able to pick up something useful for themselves.
     The program itself is a maximally simplified, small slice from my R&D version from two years ago.
