@@ -32,7 +32,7 @@ A few notes on use and configuration:
 
 It is important to understand that these parameters greatly depend on the distance of the face from the camera and the camera itself. You also need to consider that, for example, when you tilt your head, the distance between the calculated points decreases due to projection. When you run the program, you can easily check its operation with your settings, as a window will open displaying each gesture. This window can also be used for training. The window will remain open while the program is running but can be hidden behind other applications. This does not affect the program's operation.
 
-*   For Python developers: To run the program, you will need to create a virtual environment (venv) and install just 3 packages:
+*   For Python developers: Python 3.9-3.12. To run the program, you will need to create a virtual environment (venv) and install just 3 packages:
     `opencv-python`, `mediapipe`, `pyautogui`
     After that, run [able_mouse_ai_edition.py](src/ablemouse_ai_edition/able_mouse_ai_edition.py). !!After launching, don't forget to properly [calibrate the camera position](https://youtu.be/KCn4GMMQkxc)!!
 
