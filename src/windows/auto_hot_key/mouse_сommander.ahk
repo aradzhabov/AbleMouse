@@ -23,6 +23,7 @@ lastX := 0
 lastY := 0
 lastMoveTime := 0
 gestureStep := 0           ; 0: waiting, 1: left movement, 2: right movement
+menuIsOpen := false        ;
 
 ; Start monitoring movements
 SetTimer WatchGesture, 50
@@ -30,6 +31,12 @@ SetTimer WatchGesture, 50
 WatchGesture() {
     global lastX, lastY, lastMoveTime, gestureStep
     global gestureTimeWindow, minDistance, maxPause
+    global menuIsOpen
+
+    ; if open do not watch gestures
+    if (menuIsOpen) {
+        return
+    }
 
     ; Get current mouse position
     MouseGetPos(&currentX, &currentY)
@@ -79,7 +86,9 @@ ShowFeedback(message) {
 }
 
 ShowQuickPanel() {
-    global menuTimeout, menuItemHeight
+    global menuTimeout, menuItemHeight, menuIsOpen
+
+    menuIsOpen := true
 
     ; Get mouse position
     MouseGetPos(&x, &y)
@@ -160,7 +169,7 @@ ShowQuickPanel() {
 }
 
 MenuAction(action, myGui) {
-    global oskToggleHotkey, mouseJumpHotkey, crosshairHotkey
+    global oskToggleHotkey, mouseJumpHotkey, crosshairHotkey, menuIsOpen
 
     switch action {
         case "osk_toggle":
@@ -220,28 +229,34 @@ MoveCursorToOSK() {
 }
 
 DestroyMenu(myGui) {
+    global menuIsOpen
     try {
         if (WinExist(myGui.Hwnd)) {
             myGui.Destroy()
         }
     }
+    menuIsOpen := false
     ToolTip()
 }
 
 ; Function to close active GUI
 DestroyActiveGui() {
+    global menuIsOpen
     if (activeGui := GuiFromHwnd(WinExist("A"))) {
         activeGui.Destroy()
     }
+    menuIsOpen := false
     ToolTip()
 }
 
 ; Handle GUI close via Escape
 #HotIf WinActive("ahk_class AutoHotkeyGUI")
 Escape:: {
+    global menuIsOpen
     if (activeGui := GuiFromHwnd(WinExist("A"))) {
         activeGui.Destroy()
     }
+    menuIsOpen := false
 }
 #HotIf
 
