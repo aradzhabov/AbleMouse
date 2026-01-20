@@ -7,7 +7,7 @@ import socket
 import json
 
 # ============ COMMUNICATION SETTINGS ============
-USE_MENU_SYSTEM = True  # Use False if you want to run AbleMouse AI edition without integration with AbleMouse Beyond Switch server https://github.com/aradzhabov/AbleMouse/
+USE_MENU_SYSTEM = False  # Use False if you want to run AbleMouse AI edition without integration with AbleMouse Beyond Switch server https://github.com/aradzhabov/AbleMouse/
 MENU_HOST = 'localhost'
 MENU_PORT = 12345
 
