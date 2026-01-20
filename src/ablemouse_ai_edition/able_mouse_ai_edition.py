@@ -3,6 +3,13 @@ import cv2
 import mediapipe as mp
 import pyautogui
 import numpy as np
+import socket
+import json
+
+# ============ COMMUNICATION SETTINGS ============
+USE_MENU_SYSTEM = True  # Use False if you want to run AbleMouse AI edition without integration with AbleMouse Beyond Switch server https://github.com/aradzhabov/AbleMouse/
+MENU_HOST = 'localhost'
+MENU_PORT = 12345
 
 # ============ MAIN SETTINGS ============
 pyautogui.FAILSAFE = False  # Disable edge safety
@@ -39,17 +46,21 @@ RIGHT_EYE_RIGHT_CLICK_TIME_THRESHOLD = 1.0  # sec
 # Time in seconds for which the mouth needs to be open for right click
 MOUTH_OPEN_RIGHT_CLICK_TIME_THRESHOLD = 1.0  # sec
 
+# Time in seconds for which the mouth needs to be open for menu selection
+MOUTH_OPEN_MENU_SELECTION_THRESHOLD = 0.3
+
 # Cooldowns after actions in sec.
 EYE_SWITCH_COOLDOWN_DURATION = 1.0
 RIGHT_EYE_RIGHT_CLICK_COOLDOWN_DURATION = 1.0
 MOUTH_RIGHT_CLICK_COOLDOWN_DURATION = 1.0
-MOUTH_CLICK_COOLDOWN_DURATION = 0.5 # also helps to not click many times when mouse is open
+MOUTH_CLICK_COOLDOWN_DURATION = 0.5  # also helps to not click many times when mouse is open
+MOUTH_MENU_SELECTION_COOLDOWN_DURATION = 0.8  # Cooldown to select menu
 
 # Thresholds for determining closed eyes
-EYE_CLOSE_THRESHOLD = 0.005 #0.004
+EYE_CLOSE_THRESHOLD = 0.005  # 0.004
 
 # Threshold for determining open mouth
-MOUTH_OPEN_THRESHOLD = 0.002
+MOUTH_OPEN_THRESHOLD = 0.004 #in env 0.002 (AbleMouse AI edition) / 0.008 (AbleMouse Beyond Switch)
 
 # ============ FILTERING AND JITTER REDUCTION SETTINGS ============
 FILTER_METHOD = 'smooth'  # 'smooth' or 'ToDO kalman'
@@ -103,6 +114,10 @@ mouth_right_click_cooldown_time = 0
 mouth_click_cooldown = False
 mouth_click_cooldown_time = 0
 
+# Flag to prevent repeated menu selection while holding mouth open
+mouth_menu_selection_cooldown = False
+mouth_menu_selection_cooldown_time = 0
+
 # Variables for storing position history
 position_history_x = []
 position_history_y = []
@@ -115,42 +130,76 @@ smoothed_y = None
 last_action = ""
 last_action_time = 0
 
+# ============ SOCKET COMMUNICATION ============
+menu_socket = None
+
+
 # ============ END OF PROGRAM WORKING VARIABLES ============
 
-cap = cv2.VideoCapture(camera)
-if not cap.isOpened():
-    print("Cannot open camera")
-    exit()
+def connect_to_menu():
+    """connect to server"""
+    global menu_socket
+    try:
+        menu_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        menu_socket.settimeout(2.0)
+        menu_socket.connect((MENU_HOST, MENU_PORT))
+        menu_socket.settimeout(5.0)
+        print("Connected to AbleMouse Beyond Switch server")
+        return True
+    except Exception as e:
+        print(f"failed to connect to AbleMouse Beyond Switch server: {e}")
+        return False
 
-# ToDo on mac if you don't set the following values,
-# then frame_w=1920 frame_h=1080,
-# but if you set 320x240, then for some reason frame_w=640 frame_h=480
-# cap.set(cv2.CAP_PROP_FRAME_WIDTH,320)
-# cap.set(cv2.CAP_PROP_FRAME_HEIGHT,240)
+
+def send_menu_command(command):
+    """send command to AbleMouse Beyond Switch server"""
+    global menu_socket
+
+    if not menu_socket:
+        if not connect_to_menu():
+            return False
+
+    try:
+        data = json.dumps({"command": command}).encode('utf-8')
+
+        menu_socket.sendall(data)
+
+        # wait for confirmation (can be skipped)
+        try:
+            response = menu_socket.recv(1024)
+            if response:
+                response_data = json.loads(response.decode('utf-8'))
+                if response_data.get('status') == 'received':
+                    print(f"Command '{command}' is delivered to AbleMouse Beyond Switch server")
+                    return True
+        except socket.timeout:
+            print(f"Command '{command}' sent without confirmation")
+            return True
+        except:
+            print(f"Command '{command}'. Something happened")
+            return True
+
+    except Exception as e:
+        print(f"Failed to sent to to AbleMouse Beyond Switch server: {e}")
+        try:
+            menu_socket.close()
+        except:
+            pass
+        menu_socket = None
+        return False
+
+    return False
 
 
-face_mesh = mp.solutions.face_mesh.FaceMesh(refine_landmarks=True)
-screen_w, screen_h = pyautogui.size()
-x_screen_center = screen_w / 2
-y_screen_center = screen_h / 2
-
-lx = 0.4
-rx = 0.57
-lrx = (lx + rx) / 2
-screen_w_lambdax = screen_w / abs(lx - rx)
-halfx = screen_w / 2
-
-uy = 0.65
-ly = 0.79
-ulx = (uy + ly) / 2
-screen_h_lambday = screen_h / abs(uy - ly)
-halfy = screen_h / 2
-
-previous_x = 0
-previous_y = 0
-
-previous_x_threshold = 0
-previous_y_threshold = 0
+def disconnect_from_menu():
+    global menu_socket
+    if menu_socket:
+        try:
+            menu_socket.close()
+            menu_socket = None
+            print("disconnected from  AbleMouse Beyond Switch server")
+        except:
+            pass
 
 
 # ============ FILTERING FUNCTIONS ============
@@ -203,6 +252,47 @@ def set_last_action(action):
 
 
 # ============ END OF FILTERING FUNCTIONS ============
+
+# connect to AbleMouse Beyond Switch server
+if USE_MENU_SYSTEM:
+    if not connect_to_menu():
+        print("Run without integration with AbleMouse Beyond Switch server")
+        USE_MENU_SYSTEM = False
+
+cap = cv2.VideoCapture(camera)
+if not cap.isOpened():
+    print("Cannot open camera")
+    exit()
+
+# ToDo on mac if you don't set the following values,
+# then frame_w=1920 frame_h=1080,
+# but if you set 320x240, then for some reason frame_w=640 frame_h=480
+# cap.set(cv2.CAP_PROP_FRAME_WIDTH,320)
+# cap.set(cv2.CAP_PROP_FRAME_HEIGHT,240)
+
+
+face_mesh = mp.solutions.face_mesh.FaceMesh(refine_landmarks=True)
+screen_w, screen_h = pyautogui.size()
+x_screen_center = screen_w / 2
+y_screen_center = screen_h / 2
+
+lx = 0.4
+rx = 0.57
+lrx = (lx + rx) / 2
+screen_w_lambdax = screen_w / abs(lx - rx)
+halfx = screen_w / 2
+
+uy = 0.65
+ly = 0.79
+ulx = (uy + ly) / 2
+screen_h_lambday = screen_h / abs(uy - ly)
+halfy = screen_h / 2
+
+previous_x = 0
+previous_y = 0
+
+previous_x_threshold = 0
+previous_y_threshold = 0
 
 while True:
     ret, frame = cap.read()
@@ -305,6 +395,11 @@ while True:
                 current_time - mouth_click_cooldown_time) > MOUTH_CLICK_COOLDOWN_DURATION:
             mouth_click_cooldown = False
 
+        # Check mouth menu selection cooldown
+        if mouth_menu_selection_cooldown and (
+                current_time - mouth_menu_selection_cooldown_time) > MOUTH_MENU_SELECTION_COOLDOWN_DURATION:
+            mouth_menu_selection_cooldown = False
+
         # Logic for left eye (mode switching)
         if left_eye_closed:
             # If left eye just closed, start timing
@@ -385,11 +480,24 @@ while True:
             # If mouth just opened, start timing
             if not prev_mouth_open:
                 mouth_open_start_time = current_time
-                cv2.putText(frame, "Mouth open - timing started", (10, 170),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
 
-                # AT THE MOMENT OF MOUTH OPENING - check if we can make a regular click
-                if bln_cam_mouse_control and not mouth_click_cooldown:
+                # AT THE MOMENT OF MOUTH OPENING - check if we can make a menu selection
+                if USE_MENU_SYSTEM and not mouth_menu_selection_cooldown and not mouth_click_cooldown:
+                    # send commant to AbleMouse Beyond Switch server instead mouse click
+                    if send_menu_command("select_current_item"):
+                        action_text = "Menu selection (mouth open)"
+                        set_last_action(action_text)
+
+                        cv2.putText(frame, "Menu selection sent!", (frame_w // 2 - 100, 200),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+
+                        mouth_menu_selection_cooldown = True
+                        mouth_menu_selection_cooldown_time = current_time
+                    else:
+                        print("Could not send command to AbleMouse Beyond Switch server")
+
+                # Если система меню не используется, делаем обычный клик
+                elif bln_cam_mouse_control and not mouth_click_cooldown and not USE_MENU_SYSTEM:
                     # Make left click only at the start of mouth opening
                     pyautogui.click()
                     action_text = "Left click"
@@ -398,15 +506,16 @@ while True:
                     mouth_click_cooldown = True
                     mouth_click_cooldown_time = current_time
 
-            # If mouth has been open for some time, show progress for right click
-            if mouth_open_start_time is not None and not mouth_right_click_cooldown:
+            # if not USE_MENU_SYSTEM and If mouth has been open for some time, show progress for right click
+            if not USE_MENU_SYSTEM and mouth_open_start_time is not None and not mouth_right_click_cooldown:
                 elapsed_time = current_time - mouth_open_start_time
 
                 # Display progress for right click
                 progress_width = int((elapsed_time / MOUTH_OPEN_RIGHT_CLICK_TIME_THRESHOLD) * 200)
                 cv2.rectangle(frame, (10, 190), (10 + progress_width, 210), (255, 255, 0), -1)
                 cv2.rectangle(frame, (10, 190), (210, 210), (255, 255, 255), 1)
-                cv2.putText(frame, "RIGHT CLICK PROGRESS ...", (220, 205), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 2)
+                cv2.putText(frame, "RIGHT CLICK PROGRESS ...", (220, 205), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0),
+                            2)
 
                 # Check if threshold for right click is reached
                 if elapsed_time >= MOUTH_OPEN_RIGHT_CLICK_TIME_THRESHOLD:
@@ -512,6 +621,13 @@ while True:
         cv2.putText(frame, control_status, (frame_w - 250, 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, status_color, 2)
 
+        # Display menu system status
+        if USE_MENU_SYSTEM:
+            menu_status = "MENU SYSTEM: CONNECTED" if menu_socket else "MENU SYSTEM: DISCONNECTED"
+            menu_status_color = (0, 255, 0) if menu_socket else (0, 0, 255)
+            cv2.putText(frame, menu_status, (frame_w - 300, 60),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, menu_status_color, 2)
+
         # Display last performed action
         current_time = time.time()
         if last_action and (current_time - last_action_time) < LAST_ACTION_DISPLAY_TIME:
@@ -522,6 +638,9 @@ while True:
     cv2.imshow('Gagarin Data Labs -> AbleMouse AI edition', frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
+
+if USE_MENU_SYSTEM:
+    disconnect_from_menu()
 
 cv2.destroyAllWindows()
 cap.release()
