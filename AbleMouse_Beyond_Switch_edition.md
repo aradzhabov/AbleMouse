@@ -31,7 +31,8 @@ All source code and detailed setup instructions will be published **this weekend
 
 ---
 # Components, Setup, and Launch
-
+!!! coming soon - ToDo preparing for the launch
+<!--
 > **Note:** The AbleMouse Beyond Switch code is completely free and distributed under the MIT license. However, to provide audio routing, I use the VB-CABLE driver. <br>VB-CABLE is distributed as Donationware. While it is free to download and use, a donation or license purchase is expected if you find it useful or use it professionally.
 > You can support the developer using the following link to [vb-audio](https://shop.vb-audio.com/en/win-apps/11-vb-cable.html)
 
@@ -42,8 +43,8 @@ All source code and detailed setup instructions will be published **this weekend
 3.  **[main.py](src/ablemouse_beyond_switch_edition/main.py)** - The main component implementing the UI and server logic.
     *   Any application you develop that can send commands via TCP can act as a client.
     *   **Creating a Python venv and Setup**
-        *   !!!!! TODO: Which libraries need to be additionally installed.
-        * !!!!!! ToDo если будете использовать AI то нужно питон версий ..... см пунк 4 далее ро тексту
+        *   !!!!!TODO: Which libraries need to be additionally installed.
+        * !!!!!!ToDo если будете использовать AI то нужно питон версий ..... см пунк 4 далее ро тексту
     *   In [app_config.py](src/ablemouse_beyond_switch_edition/app_config.py), set the values for your configuration:
         *   `SERVER_CONFIG`
         *   `UI_CONFIG.highlight_interval` - This parameter controls the speed at which menu items alternate. It needs to be adjusted for the specific person you are helping (so they have enough time to react).
@@ -68,4 +69,4 @@ All source code and detailed setup instructions will be published **this weekend
     
 8. **Start Session**
 <br>Click on the title bar of the application window where the menu is running. Now, rely entirely on AbleMouse Beyond Switch Edition. Put your physical mouse aside and complete all tasks using only the Beyond Switch controls.
-
+-->
