@@ -6,7 +6,9 @@
 
 Imagine a person who is completely paralyzed (both body and head) and is also **unable to speak**. In the specific case I am referring to, the individual only had access to a single micro-movement — he could only slightly open his mouth.
 
-🕊️ I have developed a solution that helped a person with such a severe disability return to the digital world and regain full control of their computer. This method is more natural and flexible than traditional "Switch Control" approaches (like those implemented in macOS). I am sharing this development because it has the potential to change many lives.
+🕊️ I have developed a solution that helped a person with such a severe disability return to the digital world and regain full control of his computer. This method is more natural and flexible than traditional "Switch Control" approaches (like those implemented in macOS). <br>I am sharing this development because it has the potential to change many lives.
+
+
 
 ❤️ I would be deeply grateful if you could share this project with those in need or on specialized community forums.
 
