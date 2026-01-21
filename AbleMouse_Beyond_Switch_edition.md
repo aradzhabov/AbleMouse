@@ -24,6 +24,8 @@ Imagine a **person who is completely paralyzed (both body and head)** and is als
 
 🔹 **Flexibility:** The server component allows you to build a menu of any complexity, tailored to the specific tasks and physical capabilities of the individual.
 
+✨ **The Core Concept:** Essentially, the system creates a computer interaction interface for those with extreme physical limitations. Furthermore, it enables Windows voice control even for individuals who cannot speak.
+
 ---
 
 ### 📅 Release Schedule
@@ -31,9 +33,8 @@ All source code and detailed setup instructions will be published **this weekend
 
 ---
 # Components, Setup, and Launch
-!!! coming soon - ToDo preparing for the launch
-<!--
-> **Note:** The AbleMouse Beyond Switch code is completely free and distributed under the MIT license. However, to provide audio routing, I use the VB-CABLE driver. <br>VB-CABLE is distributed as Donationware. While it is free to download and use, a donation or license purchase is expected if you find it useful or use it professionally.
+
+> **Note:** The AbleMouse Beyond Switch code is open sourced and free and distributed under the MIT license. However, to provide audio routing, I use the VB-CABLE driver. <br>VB-CABLE is distributed as Donationware. While it is free to download and use, a donation or license purchase is expected if you find it useful or use it professionally.
 > You can support the developer using the following link to [vb-audio](https://shop.vb-audio.com/en/win-apps/11-vb-cable.html)
 
 ## Program Components, Their Purpose, and Configuration
@@ -43,8 +44,7 @@ All source code and detailed setup instructions will be published **this weekend
 3.  **[main.py](src/ablemouse_beyond_switch_edition/main.py)** - The main component implementing the UI and server logic.
     *   Any application you develop that can send commands via TCP can act as a client.
     *   **Creating a Python venv and Setup**
-        *   !!!!!TODO: Which libraries need to be additionally installed.
-        * !!!!!!ToDo если будете использовать AI то нужно питон версий ..... см пунк 4 далее ро тексту
+    ToDo
     *   In [app_config.py](src/ablemouse_beyond_switch_edition/app_config.py), set the values for your configuration:
         *   `SERVER_CONFIG`
         *   `UI_CONFIG.highlight_interval` - This parameter controls the speed at which menu items alternate. It needs to be adjusted for the specific person you are helping (so they have enough time to react).
@@ -52,9 +52,9 @@ All source code and detailed setup instructions will be published **this weekend
 4.  Any custom application you develop that can communicate with the server via the TCP protocol can be used as a client.
     *   4.1 In the demonstration video, I used **AbleMouse AI Edition** as the client. Installation and configuration must be performed according to the [AbleMouse AI Edition Setup](AbleMouse_AI_edition.md) guide.
     * 4.2 In the source code [able_mouse_ai_edition.py](src/ablemouse_ai_edition/able_mouse_ai_edition.py), set the variable:
-      * 4.2.1 *   `USE_MENU_SYSTEM = True`
+      * 4.2.1 `USE_MENU_SYSTEM` = True
       * 4.2.2  If you change the host and port for the AbleMouse Beyond Switch server, you must enter them into the `MENU_HOST` and `MENU_PORT` variables.
-      * 4.2.3   It is also recommended to slightly increase the value of `MOUTH_OPEN_THRESHOLD` from what was set in step 1. For example, in my configuration I use `0.002` when using AbleMouse AI Edition independently and `0.008` when using it together with AbleMouse Beyond Switch.
+      * 4.2.3   It is also recommended to slightly increase the value of `MOUTH_OPEN_THRESHOLD` from what was set in step 4.1. For example, in my configuration I use `0.002` when using AbleMouse AI Edition independently and `0.008` when using it together with AbleMouse Beyond Switch.
 
 5.  **Install the VB-CABLE Virtual Audio Device driver by VB-Audio Software.**
     *   Installation and setup instructions via the link: [vb_cable.md](vb_cable.md)
@@ -69,4 +69,4 @@ All source code and detailed setup instructions will be published **this weekend
     
 8. **Start Session**
 <br>Click on the title bar of the application window where the menu is running. Now, rely entirely on AbleMouse Beyond Switch Edition. Put your physical mouse aside and complete all tasks using only the Beyond Switch controls.
--->
+
