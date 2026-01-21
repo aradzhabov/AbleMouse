@@ -27,11 +27,6 @@ Imagine a **person who is completely paralyzed (both body and head)** and is als
 ✨ **The Core Concept:** Essentially, the system creates a computer interaction interface for those with extreme physical limitations. Furthermore, it enables Windows voice control even for individuals who cannot speak.
 
 ---
-
-### 📅 Release Schedule
-All source code and detailed setup instructions will be published **this weekend**.
-
----
 # Components, Setup, and Launch
 
 > **Note:** The AbleMouse Beyond Switch code is open sourced and free and distributed under the MIT license. However, to provide audio routing, I use the VB-CABLE driver. <br>VB-CABLE is distributed as Donationware. While it is free to download and use, a donation or license purchase is expected if you find it useful or use it professionally.
