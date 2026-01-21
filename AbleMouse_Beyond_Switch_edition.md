@@ -39,8 +39,8 @@ Imagine a **person who is completely paralyzed (both body and head)** and is als
 3.  **[main.py](src/ablemouse_beyond_switch_edition/main.py)** - The main component implementing the UI and server logic.
     *   Any application you develop that can send commands via TCP can act as a client.
     *   **Creating a Python venv and Setup**
-        * If you are using AbleMouse AI Edition as a client (see step 4 below), you must use Python 3.9–3.12
-        * Beyond the requirements listed in the AbleMouse AI Edition Setup, the following packages need to be installed in your virtual environment: pygame
+        * If you are using AbleMouse AI Edition as a client (see step 4 below), you must use `Python 3.9–3.12`
+        * Beyond the requirements listed in the AbleMouse AI Edition Setup, the following packages need to be installed in your virtual environment: `pygame`
   *   In [app_config.py](src/ablemouse_beyond_switch_edition/app_config.py), set the values for your configuration:
       *   `SERVER_CONFIG`
       *   `UI_CONFIG.highlight_interval` - This parameter controls the speed at which menu items alternate. It needs to be adjusted for the specific person you are helping (so they have enough time to react).
