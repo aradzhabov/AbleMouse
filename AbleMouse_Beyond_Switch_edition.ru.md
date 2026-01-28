@@ -51,11 +51,11 @@
       * 4.2.3 Также рекомендуется немного увеличить значение `MOUTH_OPEN_THRESHOLD` по сравнению с тем, что было установлено на шаге 4.1. Например, в моей конфигурации я использую `0.002` при независимом использовании AbleMouse AI Edition и `0.008` при совместном использовании с AbleMouse Beyond Switch.
 
 5.  **Установите драйвер виртуального аудиоустройства VB-CABLE от VB-Audio Software.**
-    *   Инструкции по установке и настройке по ссылке: [vb_cable.md](vb_cable.md)
+    *   Инструкции по установке и настройке по ссылке: [(en) vb_cable.md](vb_cable.md)
 
 6.  **Запустите «Голосовое управление» Windows (Voice Access)**
     *   Windows Voice Access используется для выполнения голосовых команд, генерируемых основным компонентом.
-    *   Инструкция по настройке: [windows_voice_access.md](windows_voice_access.md)
+    *   Инструкция по настройке: [(en) windows_voice_access.md](windows_voice_access.md)
 
 7.  **Запуск приложения**
     1.  Запустите сервер: выполните [main.py](src/ablemouse_beyond_switch_edition/main.py)
