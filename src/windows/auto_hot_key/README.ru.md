@@ -16,7 +16,7 @@
 ![Скриншот](./media/mouse_commander_screenshot.png)
 
 ## Исходный код
-[mouse_commander.ahk](./mouse_commander.ahk)
+[mouse_commander.ahk](./mouse_%D1%81ommander.ahk)
 
 ## Возможности
 - Распознавание жестов мыши (движение влево → вправо)
