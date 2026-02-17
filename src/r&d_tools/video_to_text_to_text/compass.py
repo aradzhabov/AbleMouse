@@ -30,7 +30,7 @@ class CameraLlamaApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Camera Llama Analyzer")
-        self.root.geometry("900x600")  # Smaller default size
+        self.root.geometry("900x600")
 
         # Settings for API format
         self.server_url = "http://localhost:8080"
@@ -45,6 +45,9 @@ class CameraLlamaApp:
         # UI state
         self.settings_visible = False
 
+        # Current instruction (for live updates)
+        self.current_instruction = "What do you see?"
+
         # Image size settings
         self.image_sizes = {
             "160x120 (very small)": (160, 120),
@@ -54,7 +57,7 @@ class CameraLlamaApp:
             "1024x768 (very large)": (1024, 768),
             "Original size": None
         }
-        self.selected_size = "320x240 (small)"  # Default small for efficiency
+        self.selected_size = "320x240 (small)"
 
         # Create session with retries
         self.session = self.create_session()
@@ -72,6 +75,7 @@ class CameraLlamaApp:
         # Queues
         self.frame_queue = Queue(maxsize=5)
         self.result_queue = Queue()
+        self.instruction_queue = Queue()  # New queue for instruction updates
 
         # Statistics
         self.stats = {'captured': 0, 'sent': 0, 'failed': 0, 'start_time': None}
@@ -88,6 +92,7 @@ class CameraLlamaApp:
         self.init_camera_threaded()
         self.update_preview()
         self.process_results()
+        self.process_instruction_updates()  # New: process instruction updates
 
     def create_session(self):
         """Create HTTP session with retries"""
@@ -120,8 +125,8 @@ class CameraLlamaApp:
         # Main container
         main_frame = ttk.Frame(self.root, padding="5")
         main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
-        main_frame.columnconfigure(0, weight=0)  # Camera panel - fixed
-        main_frame.columnconfigure(1, weight=1)  # Right panel - expands
+        main_frame.columnconfigure(0, weight=0)
+        main_frame.columnconfigure(1, weight=1)
         main_frame.rowconfigure(0, weight=1)
 
         # ========== LEFT PANEL - CAMERA ==========
@@ -151,7 +156,7 @@ class CameraLlamaApp:
         right_panel = ttk.Frame(main_frame)
         right_panel.grid(row=0, column=1, padx=2, pady=2, sticky=(tk.N, tk.W, tk.E, tk.S))
         right_panel.columnconfigure(0, weight=1)
-        right_panel.rowconfigure(3, weight=1)  # Result area expands
+        right_panel.rowconfigure(3, weight=1)
 
         # ========== TOP CONTROLS ==========
         controls = ttk.Frame(right_panel)
@@ -189,23 +194,34 @@ class CameraLlamaApp:
         # ========== INSTRUCTION ==========
         instruction_frame = ttk.LabelFrame(right_panel, text="💬 Instruction", padding="3")
         instruction_frame.grid(row=1, column=0, pady=2, sticky=(tk.W, tk.E))
-        instruction_frame.columnconfigure(0, weight=1)
+        instruction_frame.columnconfigure(1, weight=1)
 
         # Quick prompt selector
         self.prompt_combo = ttk.Combobox(instruction_frame,
                                          values=list(self.default_prompts.keys()),
-                                         width=30, height=5)
-        self.prompt_combo.grid(row=0, column=0, pady=1, sticky=(tk.W, tk.E))
+                                         width=27, height=5)
+        self.prompt_combo.grid(row=0, column=0, columnspan=2, pady=1, sticky=(tk.W, tk.E))
         self.prompt_combo.set("What do you see?")
         self.prompt_combo.bind('<<ComboboxSelected>>', self.on_prompt_selected)
 
-        # Instruction text area (smaller)
-        self.prompt_text = scrolledtext.ScrolledText(instruction_frame,
+        # Instruction text area with send button
+        text_frame = ttk.Frame(instruction_frame)
+        text_frame.grid(row=1, column=0, columnspan=2, pady=1, sticky=(tk.W, tk.E))
+        text_frame.columnconfigure(0, weight=1)
+
+        self.prompt_text = scrolledtext.ScrolledText(text_frame,
                                                      height=2,
-                                                     width=40,
+                                                     width=35,
                                                      font=("Arial", 9))
-        self.prompt_text.grid(row=1, column=0, pady=1, sticky=(tk.W, tk.E))
+        self.prompt_text.grid(row=0, column=0, pady=1, sticky=(tk.W, tk.E))
         self.prompt_text.insert('1.0', self.default_prompts["What do you see?"])
+
+        # NEW: Send instruction button
+        self.send_instruction_btn = ttk.Button(text_frame,
+                                               text="📤 Send",
+                                               command=self.send_new_instruction,
+                                               width=8)
+        self.send_instruction_btn.grid(row=0, column=1, padx=(2, 0), pady=1)
 
         # ========== SETTINGS PANEL (initially hidden) ==========
         self.settings_frame = ttk.LabelFrame(right_panel, text="⚙ Advanced Settings", padding="5")
@@ -236,10 +252,10 @@ class CameraLlamaApp:
         ttk.Label(self.settings_frame, text="Interval (ms):", font=("Arial", 8)).grid(row=2, column=0, sticky=tk.W,
                                                                                       padx=2)
         self.interval_combo = ttk.Combobox(self.settings_frame,
-                                           values=["100", "250", "500", "1000", "2000"],
+                                           values=["100", "250", "500", "1000", "2000", "3000", "5000"],
                                            width=10)
         self.interval_combo.grid(row=2, column=1, pady=1, sticky=tk.W)
-        self.interval_combo.set("500")
+        self.interval_combo.set("3000")
 
         # Hide settings initially
         self.settings_frame.grid_remove()
@@ -274,6 +290,44 @@ class CameraLlamaApp:
             self.settings_btn.config(text="⚙ Hide")
             self.settings_visible = True
 
+    def send_new_instruction(self):
+        """Send new instruction without stopping capture"""
+        new_instruction = self.prompt_text.get('1.0', 'end-1c').strip()
+        if not new_instruction:
+            new_instruction = "What do you see?"
+            self.prompt_text.insert('1.0', new_instruction)
+
+        # Update current instruction
+        self.current_instruction = new_instruction
+
+        # Put instruction update in queue
+        self.instruction_queue.put(new_instruction)
+
+        # Update status
+        self.status_label.config(text=f"Instruction updated", foreground="green")
+
+        # Optional: Force immediate send of next frame with new instruction
+        if self.is_running and self.current_frame is not None:
+            thread = threading.Thread(
+                target=self.process_frame,
+                args=(self.current_frame.copy(),),
+                daemon=True
+            )
+            thread.start()
+
+    def process_instruction_updates(self):
+        """Process instruction updates from queue"""
+        try:
+            while not self.instruction_queue.empty():
+                new_instruction = self.instruction_queue.get_nowait()
+                # Log instruction change
+                self.result_text.insert('1.0',
+                                        f"[{datetime.now().strftime('%H:%M:%S')}] 📝 Instruction changed to: '{new_instruction}'\n{'-' * 40}\n")
+        except Exception as e:
+            print(f"Error processing instruction update: {e}")
+
+        self.root.after(100, self.process_instruction_updates)
+
     def on_server_url_change(self, event):
         """Update session when server URL changes"""
         self.session = self.create_session()
@@ -304,12 +358,10 @@ class CameraLlamaApp:
 
         except Exception as e:
             print(f"Error resizing image: {e}")
-            return frame  # Return original on error
+            return frame
 
     def send_chat_completion(self, instruction, image_base64):
-        """
-        Send request in /v1/chat/completions format
-        """
+        """Send request in /v1/chat/completions format"""
         try:
             full_url = f"{self.server_url}{self.api_endpoint}"
 
@@ -392,9 +444,8 @@ class CameraLlamaApp:
             height, width = resized_frame.shape[:2]
             size_info = f"{width}x{height}"
 
-            instruction = self.prompt_text.get('1.0', 'end-1c').strip()
-            if not instruction:
-                instruction = "What do you see?"
+            # Use current instruction (can be updated dynamically)
+            instruction = self.current_instruction
 
             # Send
             response, error = self.send_chat_completion(instruction, img_base64_url)
@@ -474,7 +525,7 @@ class CameraLlamaApp:
     def process_frame(self, frame):
         """Process a single frame"""
         try:
-            timestamp = datetime.now().strftime("%H:%M:%S")[:-3]
+            timestamp = datetime.now().strftime("%H:%M:%S")
             with self.send_lock:
                 self.stats['captured'] += 1
 
@@ -534,6 +585,8 @@ class CameraLlamaApp:
                     text=f"Prompt: {selected}",
                     foreground="blue"
                 )
+                # Auto-update instruction when selecting from dropdown
+                self.send_new_instruction()
         except Exception as e:
             print(f"Error in prompt selection: {e}")
 
@@ -549,6 +602,11 @@ class CameraLlamaApp:
                 self.server_url = self.server_entry.get().rstrip('/')
 
                 self.session = self.create_session()
+
+                # Set initial instruction
+                self.current_instruction = self.prompt_text.get('1.0', 'end-1c').strip()
+                if not self.current_instruction:
+                    self.current_instruction = "What do you see?"
 
                 self.is_running = True
                 self.start_button.config(text="⏸ Stop")
