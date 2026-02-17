@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-Camera Llama Analyzer - для API формата /v1/chat/completions
-С возможностью изменения размера изображения
+Camera Llama Analyzer - for /v1/chat/completions API format
+With image resizing capability
 """
 
 import cv2
@@ -22,7 +22,7 @@ from PIL import Image, ImageTk
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-# Отключаем MSMF
+# Disable MSMF
 os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
 
 
@@ -32,7 +32,7 @@ class CameraLlamaApp:
         self.root.title("Camera Llama Analyzer - Chat Completions API")
         self.root.geometry("1200x700")
 
-        # Настройки для API формата
+        # Settings for API format
         self.server_url = "http://localhost:8080"
         self.api_endpoint = "/v1/chat/completions"
         self.camera_id = 0
@@ -42,21 +42,21 @@ class CameraLlamaApp:
         self.current_frame = None
         self.camera_ready = False
 
-        # Настройки размера изображения
+        # Image size settings
         self.image_sizes = {
-            "160x120 (очень маленький)": (160, 120),
-            "320x240 (маленький)": (320, 240),
-            "640x480 (средний)": (640, 480),
-            "800x600 (большой)": (800, 600),
-            "1024x768 (очень большой)": (1024, 768),
-            "Оригинальный размер": None
+            "160x120 (very small)": (160, 120),
+            "320x240 (small)": (320, 240),
+            "640x480 (medium)": (640, 480),
+            "800x600 (large)": (800, 600),
+            "1024x768 (very large)": (1024, 768),
+            "Original size": None
         }
-        self.selected_size = "320x240 (маленький)"  # По умолчанию маленький для экономии
+        self.selected_size = "320x240 (small)"  # Default small for efficiency
 
-        # Создаем сессию с повторными попытками
+        # Create session with retries
         self.session = self.create_session()
 
-        # Промпты
+        # Prompts
         self.default_prompts = {
             "What do you see?": "What do you see?",
             "Describe in detail": "Describe in detail what you see in this image.",
@@ -66,19 +66,19 @@ class CameraLlamaApp:
             "Read text": "What text is written in this image?"
         }
 
-        # Очереди
+        # Queues
         self.frame_queue = Queue(maxsize=5)
         self.result_queue = Queue()
 
-        # Статистика
+        # Statistics
         self.stats = {'captured': 0, 'sent': 0, 'failed': 0, 'start_time': None}
         self.camera_error = None
         self.last_send_time = 0
 
-        # Блокировка для предотвращения множественных запросов
+        # Lock to prevent multiple requests
         self.send_lock = threading.Lock()
 
-        # Максимальное количество строк в результатах
+        # Maximum number of lines in results
         self.max_result_lines = 100
 
         self.setup_ui()
@@ -87,10 +87,10 @@ class CameraLlamaApp:
         self.process_results()
 
     def create_session(self):
-        """Создание HTTP сессии с повторными попытками"""
+        """Create HTTP session with retries"""
         session = requests.Session()
 
-        # Настройка повторных попыток
+        # Configure retries
         retry_strategy = Retry(
             total=2,
             backoff_factor=0.5,
@@ -109,11 +109,11 @@ class CameraLlamaApp:
         return session
 
     def setup_ui(self):
-        """Создание интерфейса"""
+        """Create interface"""
         main_frame = ttk.Frame(self.root, padding="10")
         main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
 
-        # Левая панель - видео
+        # Left panel - video
         left_frame = ttk.Frame(main_frame)
         left_frame.grid(row=0, column=0, padx=5, pady=5, sticky=(tk.W, tk.E, tk.N, tk.S))
 
@@ -123,18 +123,18 @@ class CameraLlamaApp:
         self.video_info = ttk.Label(left_frame, text="cam: init...")
         self.video_info.grid(row=1, column=0, pady=2)
 
-        # Информация о размере
-        self.size_info = ttk.Label(left_frame, text="cur size: 320x240")
+        # Size information
+        self.size_info = ttk.Label(left_frame, text="current size: 320x240")
         self.size_info.grid(row=2, column=0, pady=2)
 
         self.stats_label = ttk.Label(left_frame, text="📸 0 | ✅ 0 | ❌ 0")
         self.stats_label.grid(row=3, column=0, pady=2)
 
-        # Правая панель
+        # Right panel
         right_frame = ttk.Frame(main_frame)
         right_frame.grid(row=0, column=1, padx=5, pady=5, sticky=(tk.W, tk.E, tk.N, tk.S))
 
-        # Информация о API
+        # API information
         info_frame = ttk.LabelFrame(right_frame, text="API Information", padding="10")
         info_frame.grid(row=0, column=0, pady=5, sticky=(tk.W, tk.E))
 
@@ -146,7 +146,7 @@ class CameraLlamaApp:
         ttk.Label(info_frame, text="OpenAI-compatible chat API",
                   foreground="green").grid(row=1, column=1, padx=5, pady=2, sticky=tk.W)
 
-        # Настройки сервера
+        # Server settings
         server_frame = ttk.LabelFrame(right_frame, text="Server Settings", padding="10")
         server_frame.grid(row=1, column=0, pady=5, sticky=(tk.W, tk.E))
 
@@ -156,12 +156,12 @@ class CameraLlamaApp:
         self.server_entry.insert(0, self.server_url)
         self.server_entry.bind('<KeyRelease>', self.on_server_url_change)
 
-        # Кнопка проверки
+        # Test button
         self.test_button = ttk.Button(server_frame, text="🔍 Test Connection",
                                       command=self.test_server)
         self.test_button.grid(row=0, column=2, padx=5, pady=2)
 
-        # Настройки камеры
+        # Camera settings
         camera_frame = ttk.LabelFrame(right_frame, text="Camera Settings", padding="10")
         camera_frame.grid(row=2, column=0, pady=5, sticky=(tk.W, tk.E))
 
@@ -174,14 +174,14 @@ class CameraLlamaApp:
                                       command=self.scan_cameras)
         self.scan_button.grid(row=0, column=2, padx=5, pady=2)
 
-        # Интервал в миллисекундах
+        # Interval in milliseconds
         ttk.Label(camera_frame, text="Interval (ms):").grid(row=1, column=0, sticky=tk.W)
         self.interval_combo = ttk.Combobox(camera_frame,
                                            values=["100", "250", "500", "1000", "2000", "3000", "5000"], width=8)
         self.interval_combo.grid(row=1, column=1, padx=5, pady=2, sticky=tk.W)
         self.interval_combo.set("500")
 
-        # НОВОЕ: Настройка размера изображения
+        # NEW: Image size settings
         size_frame = ttk.LabelFrame(right_frame, text="Image Size", padding="10")
         size_frame.grid(row=3, column=0, pady=5, sticky=(tk.W, tk.E))
 
@@ -192,13 +192,13 @@ class CameraLlamaApp:
         self.size_combo.set(self.selected_size)
         self.size_combo.bind('<<ComboboxSelected>>', self.on_size_selected)
 
-        # Информация о размере
+        # Size information
         self.size_info_label = ttk.Label(size_frame,
                                          text="Smaller size = faster, but less detail",
                                          foreground="gray", font=("Arial", 8))
         self.size_info_label.grid(row=1, column=0, columnspan=2, pady=2)
 
-        # Промпт
+        # Prompt
         prompt_frame = ttk.LabelFrame(right_frame, text="Instruction", padding="10")
         prompt_frame.grid(row=4, column=0, pady=5, sticky=(tk.W, tk.E))
 
@@ -211,7 +211,7 @@ class CameraLlamaApp:
         self.prompt_text.grid(row=1, column=0, padx=5, pady=2)
         self.prompt_text.insert('1.0', self.default_prompts["What do you see?"])
 
-        # Кнопки
+        # Buttons
         control_frame = ttk.Frame(right_frame)
         control_frame.grid(row=5, column=0, pady=10)
 
@@ -227,18 +227,18 @@ class CameraLlamaApp:
                                        command=self.clear_results, width=12)
         self.clear_button.grid(row=0, column=2, padx=2)
 
-        # Результаты
+        # Results
         result_frame = ttk.LabelFrame(right_frame, text="Response", padding="10")
         result_frame.grid(row=6, column=0, pady=5, sticky=(tk.W, tk.E, tk.N, tk.S))
 
         self.result_text = scrolledtext.ScrolledText(result_frame, height=15, width=50, wrap=tk.WORD)
         self.result_text.grid(row=0, column=0, pady=2)
 
-        # Статус
+        # Status
         self.status_label = ttk.Label(right_frame, text="Ready", foreground="green")
         self.status_label.grid(row=7, column=0, pady=5)
 
-        # Настройка весов
+        # Configure weights
         self.root.columnconfigure(0, weight=1)
         self.root.rowconfigure(0, weight=1)
         main_frame.columnconfigure(0, weight=1)
@@ -247,40 +247,40 @@ class CameraLlamaApp:
         right_frame.columnconfigure(0, weight=1)
 
     def on_server_url_change(self, event):
-        """При изменении URL сервера обновляем сессию"""
+        """Update session when server URL changes"""
         self.session = self.create_session()
 
     def on_size_selected(self, event):
-        """При изменении размера изображения"""
+        """When image size changes"""
         selected = self.size_combo.get()
         self.selected_size = selected
         size = self.image_sizes[selected]
         if size:
-            self.size_info.config(text=f"Текущий размер: {size[0]}x{size[1]}")
+            self.size_info.config(text=f"Current size: {size[0]}x{size[1]}")
         else:
-            self.size_info.config(text="Текущий размер: оригинальный")
+            self.size_info.config(text="Current size: original")
         self.status_label.config(text=f"Size changed to: {selected}", foreground="blue")
 
     def resize_image(self, frame):
-        """Изменение размера изображения в соответствии с настройками"""
+        """Resize image according to settings"""
         try:
             selected = self.size_combo.get()
             target_size = self.image_sizes.get(selected)
 
-            if target_size is None:  # Оригинальный размер
+            if target_size is None:  # Original size
                 return frame
 
-            # Изменяем размер
+            # Resize
             resized = cv2.resize(frame, target_size, interpolation=cv2.INTER_AREA)
             return resized
 
         except Exception as e:
             print(f"Error resizing image: {e}")
-            return frame  # В случае ошибки возвращаем оригинал
+            return frame  # Return original on error
 
     def send_chat_completion(self, instruction, image_base64):
         """
-        Отправка запроса в формате /v1/chat/completions
+        Send request in /v1/chat/completions format
         """
         try:
             full_url = f"{self.server_url}{self.api_endpoint}"
@@ -347,12 +347,12 @@ class CameraLlamaApp:
             return None, f"Error: {str(e)}"
 
     def send_to_server(self, frame):
-        """Подготовка и отправка кадра с изменением размера"""
+        """Prepare and send frame with resizing"""
         try:
-            # Изменяем размер перед отправкой
+            # Resize before sending
             resized_frame = self.resize_image(frame)
 
-            # Кодируем JPEG
+            # Encode JPEG
             ret, buffer = cv2.imencode('.jpg', resized_frame, [cv2.IMWRITE_JPEG_QUALITY, 80])
             if not ret:
                 return None, "Failed to encode image"
@@ -360,7 +360,7 @@ class CameraLlamaApp:
             img_base64 = base64.b64encode(buffer).decode('utf-8')
             img_base64_url = f"data:image/jpeg;base64,{img_base64}"
 
-            # Получаем размер для статистики
+            # Get size for statistics
             height, width = resized_frame.shape[:2]
             size_info = f"{width}x{height}"
 
@@ -368,10 +368,10 @@ class CameraLlamaApp:
             if not instruction:
                 instruction = "What do you see?"
 
-            # Отправляем
+            # Send
             response, error = self.send_chat_completion(instruction, img_base64_url)
 
-            # Добавляем информацию о размере к результату
+            # Add size information to result
             if response and not error:
                 response = f"[Size: {size_info}] {response}"
 
@@ -381,14 +381,14 @@ class CameraLlamaApp:
             return None, f"Error preparing image: {str(e)}"
 
     def test_server(self):
-        """Тестирование подключения к серверу"""
+        """Test server connection"""
 
         def test():
             try:
-                # Проверяем доступность базового URL
+                # Check base URL availability
                 response = self.session.get(self.server_url, timeout=3)
 
-                # Проверяем chat completions endpoint
+                # Check chat completions endpoint
                 test_payload = {
                     "max_tokens": 5,
                     "messages": [
@@ -425,7 +425,7 @@ class CameraLlamaApp:
         threading.Thread(target=test, daemon=True).start()
 
     def capture_loop(self):
-        """Цикл захвата с интервалом в миллисекундах"""
+        """Capture loop with interval in milliseconds"""
         while self.is_running:
             try:
                 if self.current_frame is not None:
@@ -444,7 +444,7 @@ class CameraLlamaApp:
                 time.sleep(0.1)
 
     def process_frame(self, frame):
-        """Обработка одного кадра"""
+        """Process a single frame"""
         try:
             timestamp = datetime.now().strftime("%H:%M:%S.%f")[:-3]
             with self.send_lock:
@@ -457,7 +457,7 @@ class CameraLlamaApp:
             print(f"Error processing frame: {e}")
 
     def process_results(self):
-        """Обработка результатов из очереди"""
+        """Process results from queue"""
         try:
             processed = 0
             max_per_cycle = 5
@@ -479,12 +479,12 @@ class CameraLlamaApp:
 
                 processed += 1
 
-            # Ограничиваем количество строк
+            # Limit number of lines
             lines = self.result_text.get('1.0', 'end-1c').split('\n')
             if len(lines) > self.max_result_lines * 2:
                 self.result_text.delete(f"{self.max_result_lines}.0", 'end')
 
-            # Обновляем статистику
+            # Update statistics
             with self.send_lock:
                 self.stats_label.config(
                     text=f"📸 {self.stats['captured']} | ✅ {self.stats['sent']} | ❌ {self.stats['failed']}"
@@ -496,7 +496,7 @@ class CameraLlamaApp:
         self.root.after(100, self.process_results)
 
     def on_prompt_selected(self, event):
-        """Выбор промпта"""
+        """Select prompt"""
         try:
             selected = self.prompt_combo.get()
             if selected in self.default_prompts:
@@ -510,7 +510,7 @@ class CameraLlamaApp:
             print(f"Error in prompt selection: {e}")
 
     def toggle_capture(self):
-        """Запуск/остановка"""
+        """Start/stop capture"""
         if not self.camera_ready:
             messagebox.showerror("Error", "Camera not ready!")
             return
@@ -543,7 +543,7 @@ class CameraLlamaApp:
             self.status_label.config(text="Processing stopped", foreground="blue")
 
     def capture_snapshot(self):
-        """Ручной снимок"""
+        """Manual snapshot"""
         if self.current_frame is not None and self.camera_ready:
             thread = threading.Thread(
                 target=self.process_frame,
@@ -555,7 +555,7 @@ class CameraLlamaApp:
             self.status_label.config(text=f"Snapshot sent ({size_text})", foreground="green")
 
     def clear_results(self):
-        """Очистка результатов"""
+        """Clear results"""
         self.result_text.delete('1.0', tk.END)
         with self.send_lock:
             self.stats = {'captured': 0, 'sent': 0, 'failed': 0, 'start_time': None}
@@ -624,7 +624,7 @@ class CameraLlamaApp:
                         cv2.putText(frame, "REC", (10, 30),
                                     cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
-                    # Показываем в превью оригинальный размер (не измененный)
+                    # Show original size in preview (not resized)
                     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                     img = Image.fromarray(frame_rgb)
                     img = img.resize((480, 360), Image.Resampling.LANCZOS)
