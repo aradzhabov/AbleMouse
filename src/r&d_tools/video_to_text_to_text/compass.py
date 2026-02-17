@@ -29,8 +29,8 @@ os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
 class CameraLlamaApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Camera Llama Analyzer - Chat Completions API")
-        self.root.geometry("1200x700")
+        self.root.title("Camera Llama Analyzer")
+        self.root.geometry("900x600")  # Smaller default size
 
         # Settings for API format
         self.server_url = "http://localhost:8080"
@@ -41,6 +41,9 @@ class CameraLlamaApp:
         self.cap = None
         self.current_frame = None
         self.camera_ready = False
+
+        # UI state
+        self.settings_visible = False
 
         # Image size settings
         self.image_sizes = {
@@ -109,142 +112,167 @@ class CameraLlamaApp:
         return session
 
     def setup_ui(self):
-        """Create interface"""
-        main_frame = ttk.Frame(self.root, padding="10")
+        """Create compact interface"""
+        # Configure root grid
+        self.root.columnconfigure(0, weight=1)
+        self.root.rowconfigure(0, weight=1)
+
+        # Main container
+        main_frame = ttk.Frame(self.root, padding="5")
         main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        main_frame.columnconfigure(0, weight=0)  # Camera panel - fixed
+        main_frame.columnconfigure(1, weight=1)  # Right panel - expands
+        main_frame.rowconfigure(0, weight=1)
 
-        # Left panel - video
-        left_frame = ttk.Frame(main_frame)
-        left_frame.grid(row=0, column=0, padx=5, pady=5, sticky=(tk.W, tk.E, tk.N, tk.S))
+        # ========== LEFT PANEL - CAMERA ==========
+        camera_panel = ttk.LabelFrame(main_frame, text="📷 Camera Preview", padding="5")
+        camera_panel.grid(row=0, column=0, padx=2, pady=2, sticky=(tk.N, tk.W, tk.E))
+        camera_panel.columnconfigure(0, weight=1)
 
-        self.video_label = ttk.Label(left_frame)
-        self.video_label.grid(row=0, column=0, pady=5)
+        # Video preview
+        self.video_label = ttk.Label(camera_panel, relief="solid")
+        self.video_label.grid(row=0, column=0, pady=2)
 
-        self.video_info = ttk.Label(left_frame, text="cam: init...")
-        self.video_info.grid(row=1, column=0, pady=2)
+        # Camera status and basic controls
+        status_frame = ttk.Frame(camera_panel)
+        status_frame.grid(row=1, column=0, pady=2, sticky=(tk.W, tk.E))
 
-        # Size information
-        self.size_info = ttk.Label(left_frame, text="current size: 320x240")
-        self.size_info.grid(row=2, column=0, pady=2)
+        self.video_info = ttk.Label(status_frame, text="📹 Initializing...", font=("Arial", 8))
+        self.video_info.pack(side=tk.LEFT, padx=2)
 
-        self.stats_label = ttk.Label(left_frame, text="📸 0 | ✅ 0 | ❌ 0")
-        self.stats_label.grid(row=3, column=0, pady=2)
+        self.stats_label = ttk.Label(status_frame, text="📸0 ✅0 ❌0", font=("Arial", 8))
+        self.stats_label.pack(side=tk.RIGHT, padx=2)
 
-        # Right panel
-        right_frame = ttk.Frame(main_frame)
-        right_frame.grid(row=0, column=1, padx=5, pady=5, sticky=(tk.W, tk.E, tk.N, tk.S))
+        # Size info
+        self.size_info = ttk.Label(camera_panel, text="📏 320x240", font=("Arial", 7), foreground="gray")
+        self.size_info.grid(row=2, column=0, pady=1)
 
-        # API information
-        info_frame = ttk.LabelFrame(right_frame, text="API Information", padding="10")
-        info_frame.grid(row=0, column=0, pady=5, sticky=(tk.W, tk.E))
+        # ========== RIGHT PANEL ==========
+        right_panel = ttk.Frame(main_frame)
+        right_panel.grid(row=0, column=1, padx=2, pady=2, sticky=(tk.N, tk.W, tk.E, tk.S))
+        right_panel.columnconfigure(0, weight=1)
+        right_panel.rowconfigure(3, weight=1)  # Result area expands
 
-        ttk.Label(info_frame, text="Endpoint:").grid(row=0, column=0, sticky=tk.W)
-        ttk.Label(info_frame, text="/v1/chat/completions",
-                  foreground="blue").grid(row=0, column=1, padx=5, pady=2, sticky=tk.W)
+        # ========== TOP CONTROLS ==========
+        controls = ttk.Frame(right_panel)
+        controls.grid(row=0, column=0, pady=2, sticky=(tk.W, tk.E))
+        controls.columnconfigure(0, weight=1)
 
-        ttk.Label(info_frame, text="Format:").grid(row=1, column=0, sticky=tk.W)
-        ttk.Label(info_frame, text="OpenAI-compatible chat API",
-                  foreground="green").grid(row=1, column=1, padx=5, pady=2, sticky=tk.W)
+        # Main buttons row
+        button_frame = ttk.Frame(controls)
+        button_frame.grid(row=0, column=0, pady=2, sticky=(tk.W, tk.E))
 
-        # Server settings
-        server_frame = ttk.LabelFrame(right_frame, text="Server Settings", padding="10")
-        server_frame.grid(row=1, column=0, pady=5, sticky=(tk.W, tk.E))
+        self.start_button = ttk.Button(button_frame, text="▶ Start", command=self.toggle_capture, width=8)
+        self.start_button.pack(side=tk.LEFT, padx=1)
 
-        ttk.Label(server_frame, text="Base URL:").grid(row=0, column=0, sticky=tk.W)
-        self.server_entry = ttk.Entry(server_frame, width=40)
-        self.server_entry.grid(row=0, column=1, padx=5, pady=2)
-        self.server_entry.insert(0, self.server_url)
-        self.server_entry.bind('<KeyRelease>', self.on_server_url_change)
+        self.snapshot_button = ttk.Button(button_frame, text="📸 Shot", command=self.capture_snapshot, width=8)
+        self.snapshot_button.pack(side=tk.LEFT, padx=1)
 
-        # Test button
-        self.test_button = ttk.Button(server_frame, text="🔍 Test Connection",
-                                      command=self.test_server)
-        self.test_button.grid(row=0, column=2, padx=5, pady=2)
+        self.clear_button = ttk.Button(button_frame, text="🧹 Clear", command=self.clear_results, width=8)
+        self.clear_button.pack(side=tk.LEFT, padx=1)
 
-        # Camera settings
-        camera_frame = ttk.LabelFrame(right_frame, text="Camera Settings", padding="10")
-        camera_frame.grid(row=2, column=0, pady=5, sticky=(tk.W, tk.E))
+        self.settings_btn = ttk.Button(button_frame, text="⚙ Settings", command=self.toggle_settings, width=8)
+        self.settings_btn.pack(side=tk.LEFT, padx=1)
 
-        ttk.Label(camera_frame, text="Camera ID:").grid(row=0, column=0, sticky=tk.W)
-        self.camera_spin = ttk.Spinbox(camera_frame, from_=0, to=10, width=10)
-        self.camera_spin.grid(row=0, column=1, padx=5, pady=2, sticky=tk.W)
+        # Camera ID quick selector
+        cam_frame = ttk.Frame(controls)
+        cam_frame.grid(row=1, column=0, pady=1, sticky=(tk.W, tk.E))
+
+        ttk.Label(cam_frame, text="Camera:", font=("Arial", 8)).pack(side=tk.LEFT)
+        self.camera_spin = ttk.Spinbox(cam_frame, from_=0, to=10, width=3)
+        self.camera_spin.pack(side=tk.LEFT, padx=2)
         self.camera_spin.insert(0, "0")
 
-        self.scan_button = ttk.Button(camera_frame, text="🔍 Scan Cameras",
-                                      command=self.scan_cameras)
-        self.scan_button.grid(row=0, column=2, padx=5, pady=2)
+        self.scan_btn = ttk.Button(cam_frame, text="🔍", command=self.scan_cameras, width=2)
+        self.scan_btn.pack(side=tk.LEFT, padx=1)
 
-        # Interval in milliseconds
-        ttk.Label(camera_frame, text="Interval (ms):").grid(row=1, column=0, sticky=tk.W)
-        self.interval_combo = ttk.Combobox(camera_frame,
-                                           values=["100", "250", "500", "1000", "2000", "3000", "5000"], width=8)
-        self.interval_combo.grid(row=1, column=1, padx=5, pady=2, sticky=tk.W)
-        self.interval_combo.set("500")
+        # ========== INSTRUCTION ==========
+        instruction_frame = ttk.LabelFrame(right_panel, text="💬 Instruction", padding="3")
+        instruction_frame.grid(row=1, column=0, pady=2, sticky=(tk.W, tk.E))
+        instruction_frame.columnconfigure(0, weight=1)
 
-        # NEW: Image size settings
-        size_frame = ttk.LabelFrame(right_frame, text="Image Size", padding="10")
-        size_frame.grid(row=3, column=0, pady=5, sticky=(tk.W, tk.E))
-
-        ttk.Label(size_frame, text="Send size:").grid(row=0, column=0, sticky=tk.W)
-        self.size_combo = ttk.Combobox(size_frame,
-                                       values=list(self.image_sizes.keys()), width=25)
-        self.size_combo.grid(row=0, column=1, padx=5, pady=2)
-        self.size_combo.set(self.selected_size)
-        self.size_combo.bind('<<ComboboxSelected>>', self.on_size_selected)
-
-        # Size information
-        self.size_info_label = ttk.Label(size_frame,
-                                         text="Smaller size = faster, but less detail",
-                                         foreground="gray", font=("Arial", 8))
-        self.size_info_label.grid(row=1, column=0, columnspan=2, pady=2)
-
-        # Prompt
-        prompt_frame = ttk.LabelFrame(right_frame, text="Instruction", padding="10")
-        prompt_frame.grid(row=4, column=0, pady=5, sticky=(tk.W, tk.E))
-
-        self.prompt_combo = ttk.Combobox(prompt_frame, values=list(self.default_prompts.keys()), width=37)
-        self.prompt_combo.grid(row=0, column=0, padx=5, pady=2)
+        # Quick prompt selector
+        self.prompt_combo = ttk.Combobox(instruction_frame,
+                                         values=list(self.default_prompts.keys()),
+                                         width=30, height=5)
+        self.prompt_combo.grid(row=0, column=0, pady=1, sticky=(tk.W, tk.E))
         self.prompt_combo.set("What do you see?")
         self.prompt_combo.bind('<<ComboboxSelected>>', self.on_prompt_selected)
 
-        self.prompt_text = scrolledtext.ScrolledText(prompt_frame, height=2, width=40)
-        self.prompt_text.grid(row=1, column=0, padx=5, pady=2)
+        # Instruction text area (smaller)
+        self.prompt_text = scrolledtext.ScrolledText(instruction_frame,
+                                                     height=2,
+                                                     width=40,
+                                                     font=("Arial", 9))
+        self.prompt_text.grid(row=1, column=0, pady=1, sticky=(tk.W, tk.E))
         self.prompt_text.insert('1.0', self.default_prompts["What do you see?"])
 
-        # Buttons
-        control_frame = ttk.Frame(right_frame)
-        control_frame.grid(row=5, column=0, pady=10)
+        # ========== SETTINGS PANEL (initially hidden) ==========
+        self.settings_frame = ttk.LabelFrame(right_panel, text="⚙ Advanced Settings", padding="5")
+        self.settings_frame.grid(row=2, column=0, pady=2, sticky=(tk.W, tk.E))
+        self.settings_frame.columnconfigure(1, weight=1)
 
-        self.start_button = ttk.Button(control_frame, text="▶ Start",
-                                       command=self.toggle_capture, width=12)
-        self.start_button.grid(row=0, column=0, padx=2)
+        # Server URL
+        ttk.Label(self.settings_frame, text="Server:", font=("Arial", 8)).grid(row=0, column=0, sticky=tk.W, padx=2)
+        self.server_entry = ttk.Entry(self.settings_frame, width=30)
+        self.server_entry.grid(row=0, column=1, pady=1, sticky=(tk.W, tk.E))
+        self.server_entry.insert(0, self.server_url)
+        self.server_entry.bind('<KeyRelease>', self.on_server_url_change)
 
-        self.snapshot_button = ttk.Button(control_frame, text="📸 Snapshot",
-                                          command=self.capture_snapshot, width=12)
-        self.snapshot_button.grid(row=0, column=1, padx=2)
+        self.test_button = ttk.Button(self.settings_frame, text="Test",
+                                      command=self.test_server, width=5)
+        self.test_button.grid(row=0, column=2, padx=2)
 
-        self.clear_button = ttk.Button(control_frame, text="🧹 Clear",
-                                       command=self.clear_results, width=12)
-        self.clear_button.grid(row=0, column=2, padx=2)
+        # Image size
+        ttk.Label(self.settings_frame, text="Size:", font=("Arial", 8)).grid(row=1, column=0, sticky=tk.W, padx=2)
+        self.size_combo = ttk.Combobox(self.settings_frame,
+                                       values=list(self.image_sizes.keys()),
+                                       width=27)
+        self.size_combo.grid(row=1, column=1, pady=1, sticky=(tk.W, tk.E))
+        self.size_combo.set(self.selected_size)
+        self.size_combo.bind('<<ComboboxSelected>>', self.on_size_selected)
 
-        # Results
-        result_frame = ttk.LabelFrame(right_frame, text="Response", padding="10")
-        result_frame.grid(row=6, column=0, pady=5, sticky=(tk.W, tk.E, tk.N, tk.S))
+        # Interval
+        ttk.Label(self.settings_frame, text="Interval (ms):", font=("Arial", 8)).grid(row=2, column=0, sticky=tk.W,
+                                                                                      padx=2)
+        self.interval_combo = ttk.Combobox(self.settings_frame,
+                                           values=["100", "250", "500", "1000", "2000"],
+                                           width=10)
+        self.interval_combo.grid(row=2, column=1, pady=1, sticky=tk.W)
+        self.interval_combo.set("500")
 
-        self.result_text = scrolledtext.ScrolledText(result_frame, height=15, width=50, wrap=tk.WORD)
-        self.result_text.grid(row=0, column=0, pady=2)
+        # Hide settings initially
+        self.settings_frame.grid_remove()
 
-        # Status
-        self.status_label = ttk.Label(right_frame, text="Ready", foreground="green")
-        self.status_label.grid(row=7, column=0, pady=5)
+        # ========== RESULTS ==========
+        result_frame = ttk.LabelFrame(right_panel, text="📝 Response", padding="3")
+        result_frame.grid(row=3, column=0, pady=2, sticky=(tk.W, tk.E, tk.N, tk.S))
+        result_frame.columnconfigure(0, weight=1)
+        result_frame.rowconfigure(0, weight=1)
 
-        # Configure weights
-        self.root.columnconfigure(0, weight=1)
-        self.root.rowconfigure(0, weight=1)
-        main_frame.columnconfigure(0, weight=1)
-        main_frame.columnconfigure(1, weight=1)
-        main_frame.rowconfigure(0, weight=1)
-        right_frame.columnconfigure(0, weight=1)
+        self.result_text = scrolledtext.ScrolledText(result_frame,
+                                                     height=12,
+                                                     width=50,
+                                                     wrap=tk.WORD,
+                                                     font=("Arial", 9))
+        self.result_text.grid(row=0, column=0, pady=1, sticky=(tk.W, tk.E, tk.N, tk.S))
+
+        # Status bar
+        self.status_label = ttk.Label(right_panel, text="Ready",
+                                      foreground="green",
+                                      font=("Arial", 8))
+        self.status_label.grid(row=4, column=0, pady=1, sticky=tk.W)
+
+    def toggle_settings(self):
+        """Show/hide advanced settings panel"""
+        if self.settings_visible:
+            self.settings_frame.grid_remove()
+            self.settings_btn.config(text="⚙ Settings")
+            self.settings_visible = False
+        else:
+            self.settings_frame.grid()
+            self.settings_btn.config(text="⚙ Hide")
+            self.settings_visible = True
 
     def on_server_url_change(self, event):
         """Update session when server URL changes"""
@@ -256,10 +284,10 @@ class CameraLlamaApp:
         self.selected_size = selected
         size = self.image_sizes[selected]
         if size:
-            self.size_info.config(text=f"Current size: {size[0]}x{size[1]}")
+            self.size_info.config(text=f"📏 {size[0]}x{size[1]}")
         else:
-            self.size_info.config(text="Current size: original")
-        self.status_label.config(text=f"Size changed to: {selected}", foreground="blue")
+            self.size_info.config(text="📏 Original")
+        self.status_label.config(text=f"Size: {selected}", foreground="blue")
 
     def resize_image(self, frame):
         """Resize image according to settings"""
@@ -373,7 +401,7 @@ class CameraLlamaApp:
 
             # Add size information to result
             if response and not error:
-                response = f"[Size: {size_info}] {response}"
+                response = f"[{size_info}] {response}"
 
             return response, error
 
@@ -446,7 +474,7 @@ class CameraLlamaApp:
     def process_frame(self, frame):
         """Process a single frame"""
         try:
-            timestamp = datetime.now().strftime("%H:%M:%S.%f")[:-3]
+            timestamp = datetime.now().strftime("%H:%M:%S")[:-3]
             with self.send_lock:
                 self.stats['captured'] += 1
 
@@ -467,15 +495,15 @@ class CameraLlamaApp:
 
                 if error:
                     self.result_text.insert('1.0',
-                                            f"[{timestamp}] ❌ {error}\n{'-' * 50}\n")
+                                            f"[{timestamp}] ❌ {error}\n{'-' * 40}\n")
                 else:
-                    if response and len(response) > 500:
-                        display_response = response[:500] + "...\n[response truncated]"
+                    if response and len(response) > 300:
+                        display_response = response[:300] + "..."
                     else:
                         display_response = response if response else "Empty response"
 
                     self.result_text.insert('1.0',
-                                            f"[{timestamp}] 🤖 Response:\n{display_response}\n{'-' * 50}\n")
+                                            f"[{timestamp}] 🤖 {display_response}\n{'-' * 40}\n")
 
                 processed += 1
 
@@ -487,7 +515,7 @@ class CameraLlamaApp:
             # Update statistics
             with self.send_lock:
                 self.stats_label.config(
-                    text=f"📸 {self.stats['captured']} | ✅ {self.stats['sent']} | ❌ {self.stats['failed']}"
+                    text=f"📸{self.stats['captured']} ✅{self.stats['sent']} ❌{self.stats['failed']}"
                 )
 
         except Exception as e:
@@ -503,7 +531,7 @@ class CameraLlamaApp:
                 self.prompt_text.delete('1.0', 'end')
                 self.prompt_text.insert('1.0', self.default_prompts[selected])
                 self.status_label.config(
-                    text=f"Instruction changed to: {selected}",
+                    text=f"Prompt: {selected}",
                     foreground="blue"
                 )
         except Exception as e:
@@ -529,18 +557,14 @@ class CameraLlamaApp:
                 self.capture_thread = threading.Thread(target=self.capture_loop, daemon=True)
                 self.capture_thread.start()
 
-                self.status_label.config(text="Processing started...", foreground="red")
-                instruction_text = self.prompt_text.get('1.0', 'end-1c').strip()
-                size_text = self.size_combo.get()
-                self.result_text.insert('1.0',
-                                        f"Started with instruction: '{instruction_text}', Size: {size_text}\n{'-' * 50}\n")
+                self.status_label.config(text="Processing...", foreground="red")
 
             except Exception as e:
                 messagebox.showerror("Error", f"Invalid settings: {e}")
         else:
             self.is_running = False
             self.start_button.config(text="▶ Start")
-            self.status_label.config(text="Processing stopped", foreground="blue")
+            self.status_label.config(text="Stopped", foreground="blue")
 
     def capture_snapshot(self):
         """Manual snapshot"""
@@ -551,15 +575,14 @@ class CameraLlamaApp:
                 daemon=True
             )
             thread.start()
-            size_text = self.size_combo.get()
-            self.status_label.config(text=f"Snapshot sent ({size_text})", foreground="green")
+            self.status_label.config(text="Snapshot sent", foreground="green")
 
     def clear_results(self):
         """Clear results"""
         self.result_text.delete('1.0', tk.END)
         with self.send_lock:
             self.stats = {'captured': 0, 'sent': 0, 'failed': 0, 'start_time': None}
-        self.stats_label.config(text="📸 0 | ✅ 0 | ❌ 0")
+        self.stats_label.config(text="📸0 ✅0 ❌0")
         self.status_label.config(text="Cleared", foreground="blue")
 
     def init_camera_threaded(self):
@@ -593,7 +616,7 @@ class CameraLlamaApp:
                             self.cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
 
                             self.root.after(0, self.update_camera_status,
-                                            f"✓ Camera ready ({name})", "green")
+                                            f"✓ {name}", "green")
                             return
                         else:
                             cap.release()
@@ -603,15 +626,15 @@ class CameraLlamaApp:
 
             self.camera_ready = False
             self.root.after(0, self.update_camera_status,
-                            "❌ Camera not found", "red")
+                            "❌ Not found", "red")
 
         except Exception as e:
             self.camera_ready = False
             self.root.after(0, self.update_camera_status,
-                            f"❌ Error: {str(e)[:30]}", "red")
+                            f"❌ Error", "red")
 
     def update_camera_status(self, text, color):
-        self.video_info.config(text=text, foreground=color)
+        self.video_info.config(text=f"📹 {text}", foreground=color)
 
     def update_preview(self):
         if self.cap and self.cap.isOpened() and self.camera_ready:
@@ -621,13 +644,13 @@ class CameraLlamaApp:
                     self.current_frame = frame
 
                     if self.is_running:
-                        cv2.putText(frame, "REC", (10, 30),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                        cv2.putText(frame, "REC", (10, 25),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
-                    # Show original size in preview (not resized)
+                    # Show original size in preview
                     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                     img = Image.fromarray(frame_rgb)
-                    img = img.resize((480, 360), Image.Resampling.LANCZOS)
+                    img = img.resize((320, 240), Image.Resampling.LANCZOS)
                     imgtk = ImageTk.PhotoImage(image=img)
 
                     self.video_label.imgtk = imgtk
