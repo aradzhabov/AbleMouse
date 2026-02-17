@@ -69,7 +69,8 @@ class CameraLlamaApp:
             "List objects": "List all objects you can see in this image.",
             "Describe scene": "Describe the scene, environment, time of day.",
             "How many faces?": "How many faces are in this image?",
-            "Read text": "What text is written in this image?"
+            "Read text": "What text is written in this image?",
+            "Your own question": "What do you see?"
         }
 
         # Queues
@@ -201,7 +202,7 @@ class CameraLlamaApp:
                                          values=list(self.default_prompts.keys()),
                                          width=27, height=5)
         self.prompt_combo.grid(row=0, column=0, columnspan=2, pady=1, sticky=(tk.W, tk.E))
-        self.prompt_combo.set("What do you see?")
+        self.prompt_combo.set("Your own question")
         self.prompt_combo.bind('<<ComboboxSelected>>', self.on_prompt_selected)
 
         # Instruction text area with send button
