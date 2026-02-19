@@ -224,6 +224,12 @@ class CameraLlamaApp:
                                                width=8)
         self.send_instruction_btn.grid(row=0, column=1, padx=(2, 0), pady=1)
 
+        self.one_shot_after_send = tk.BooleanVar(value=False)
+        self.one_shot_check = ttk.Checkbutton(instruction_frame,
+                                              text="One-shot on Send",
+                                              variable=self.one_shot_after_send)
+        self.one_shot_check.grid(row=2, column=0, columnspan=2, sticky=tk.W, pady=(2, 0))
+
         # ========== SETTINGS PANEL (initially hidden) ==========
         self.settings_frame = ttk.LabelFrame(right_panel, text="⚙ Advanced Settings", padding="5")
         self.settings_frame.grid(row=2, column=0, pady=2, sticky=(tk.W, tk.E))
@@ -308,7 +314,9 @@ class CameraLlamaApp:
         self.status_label.config(text=f"Instruction updated", foreground="green")
 
         # Optional: Force immediate send of next frame with new instruction
-        if self.is_running and self.current_frame is not None:
+        if self.one_shot_after_send.get():
+            self.capture_snapshot()
+        elif self.is_running and self.current_frame is not None:
             thread = threading.Thread(
                 target=self.process_frame,
                 args=(self.current_frame.copy(),),
