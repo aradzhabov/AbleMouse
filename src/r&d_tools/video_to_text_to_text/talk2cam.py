@@ -26,7 +26,7 @@ import subprocess
 import shutil
 try:
     import vlc
-    import Kostya_demo_cfg_helper as cfg
+    import cfg_helper as cfg
     VLC_AVAILABLE = True
 except Exception:
     vlc = None
@@ -208,8 +208,6 @@ class CameraLlamaApp:
         self.settings_btn = ttk.Button(button_frame, text="⚙ Settings", command=self.toggle_settings, width=8)
         self.settings_btn.pack(side=tk.LEFT, padx=1)
 
-        self.avatar_check = ttk.Checkbutton(button_frame, text="Avatar", variable=self.avatar_enabled)
-        self.avatar_check.pack(side=tk.LEFT, padx=4)
 
         # Camera ID quick selector
         cam_frame = ttk.Frame(controls)
@@ -247,6 +245,7 @@ class CameraLlamaApp:
                                                      font=("Arial", 9))
         self.prompt_text.grid(row=0, column=0, pady=1, sticky=(tk.W, tk.E))
         self.prompt_text.insert('1.0', self.default_prompts["What do you see?"])
+        self.prompt_text.bind('<Return>', self.on_prompt_enter)
 
         # NEW: Send instruction button
         self.send_instruction_btn = ttk.Button(text_frame,
@@ -255,11 +254,20 @@ class CameraLlamaApp:
                                                width=8)
         self.send_instruction_btn.grid(row=0, column=1, padx=(2, 0), pady=1)
 
+        # Options row: One-shot and Avatar
+        self.options_frame = ttk.Frame(instruction_frame)
+        self.options_frame.grid(row=2, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(2, 0))
+
         self.one_shot_after_send = tk.BooleanVar(value=False)
-        self.one_shot_check = ttk.Checkbutton(instruction_frame,
+        self.one_shot_check = ttk.Checkbutton(self.options_frame,
                                               text="One-shot on Send",
                                               variable=self.one_shot_after_send)
-        self.one_shot_check.grid(row=2, column=0, columnspan=2, sticky=tk.W, pady=(2, 0))
+        self.one_shot_check.grid(row=0, column=0, padx=(0, 8), sticky=tk.W)
+
+        self.avatar_check = ttk.Checkbutton(self.options_frame,
+                                            text="Avatar",
+                                            variable=self.avatar_enabled)
+        self.avatar_check.grid(row=0, column=1, sticky=tk.W)
 
         # ========== SETTINGS PANEL (initially hidden) ==========
         self.settings_frame = ttk.LabelFrame(right_panel, text="⚙ Advanced Settings", padding="5")
@@ -354,6 +362,13 @@ class CameraLlamaApp:
                 daemon=True
             )
             thread.start()
+
+    def on_prompt_enter(self, event):
+        try:
+            self.send_new_instruction()
+            return "break"
+        except Exception:
+            return "break"
 
     def process_instruction_updates(self):
         """Process instruction updates from queue"""
@@ -695,7 +710,12 @@ class CameraLlamaApp:
                                             f"[{timestamp}] ❌ {error}\n{'-' * 40}\n")
                 else:
                     if response and self.avatar_enabled.get():
-                        threading.Thread(target=self.generate_avatar_from_text, args=(response,), daemon=True).start()
+                        tts_text = response
+                        if tts_text.startswith('['):
+                            end_idx = tts_text.find(']')
+                            if end_idx != -1:
+                                tts_text = tts_text[end_idx + 1:].lstrip()
+                        threading.Thread(target=self.generate_avatar_from_text, args=(tts_text,), daemon=True).start()
 
                     if response and len(response) > 300:
                         display_response = response[:300] + "..."
@@ -911,9 +931,15 @@ class CameraLlamaApp:
                     dst = os.path.join(dst_dir, f"{hash_id}.ogg")
                     shutil.copy(src, dst)
                     return True
+            if getattr(cfg, "USE_EDGE_TTS", False):
+                lang = getattr(cfg, "DEFAULT_LANG", "en")
+                script_path = os.path.join(os.path.dirname(__file__), "tts_edge.py")
+                proc = subprocess.Popen([sys.executable, script_path, text, hash_id, lang])
+                rc = proc.wait()
+                return rc == 0
             if getattr(cfg, "USE_GOOGLE_TTS", True):
                 lang = getattr(cfg, "DEFAULT_LANG", "en")
-                script_path = os.path.join(os.path.dirname(__file__), "text2speach_google.py")
+                script_path = os.path.join(os.path.dirname(__file__), "tts_google.py")
                 proc = subprocess.Popen([sys.executable, script_path, text, hash_id, lang])
                 rc = proc.wait()
                 return rc == 0
