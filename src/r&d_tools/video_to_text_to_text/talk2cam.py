@@ -21,6 +21,14 @@ from tkinter import ttk, scrolledtext, messagebox
 from PIL import Image, ImageTk
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+try:
+    import vlc
+    import Kostya_demo_cfg_helper as cfg
+    VLC_AVAILABLE = True
+except Exception:
+    vlc = None
+    cfg = None
+    VLC_AVAILABLE = False
 
 # Disable MSMF
 os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
@@ -89,11 +97,18 @@ class CameraLlamaApp:
         # Maximum number of lines in results
         self.max_result_lines = 100
 
+        # Media watcher state
+        self.vlc_instance = None
+        self.vlc_player = None
+        self.media_known_files = {}
+        self.media_last_activity = time.time()
+
         self.setup_ui()
         self.init_camera_threaded()
         self.update_preview()
         self.process_results()
         self.process_instruction_updates()  # New: process instruction updates
+        self.start_media_watcher()
 
     def create_session(self):
         """Create HTTP session with retries"""
@@ -152,6 +167,13 @@ class CameraLlamaApp:
         # Size info
         self.size_info = ttk.Label(camera_panel, text="📏 320x240", font=("Arial", 7), foreground="gray")
         self.size_info.grid(row=2, column=0, pady=1)
+
+        # Media output under camera
+        media_panel = ttk.LabelFrame(camera_panel, text="🎬 Media", padding="5")
+        media_panel.grid(row=3, column=0, padx=2, pady=2, sticky=(tk.W, tk.E))
+        media_panel.columnconfigure(0, weight=1)
+        self.media_canvas = tk.Canvas(media_panel, width=320, height=240, bg="black", highlightthickness=1)
+        self.media_canvas.grid(row=0, column=0, sticky=(tk.W, tk.E))
 
         # ========== RIGHT PANEL ==========
         right_panel = ttk.Frame(main_frame)
@@ -340,6 +362,112 @@ class CameraLlamaApp:
     def on_server_url_change(self, event):
         """Update session when server URL changes"""
         self.session = self.create_session()
+
+    def setup_vlc_player(self):
+        if not VLC_AVAILABLE:
+            return
+        if not self.vlc_instance:
+            self.vlc_instance = vlc.Instance()
+        if not self.vlc_player:
+            self.vlc_player = self.vlc_instance.media_player_new()
+            try:
+                self.vlc_player.video_set_scale(cfg.VIDEO_SCALE_FOR_FILE_WATCHER if cfg else 1.0)
+            except Exception:
+                pass
+        try:
+            hwnd = self.media_canvas.winfo_id()
+            if os.name == "nt":
+                self.vlc_player.set_hwnd(hwnd)
+        except Exception:
+            pass
+
+    def close_vlc_player(self):
+        try:
+            if self.vlc_player:
+                self.vlc_player.stop()
+                self.vlc_player.release()
+                self.vlc_player = None
+            if self.vlc_instance:
+                self.vlc_instance.release()
+                self.vlc_instance = None
+        except Exception:
+            pass
+
+    def get_current_media_files(self):
+        try:
+            folder = cfg.WATCH_DIR if cfg else None
+            filt = (cfg.WATCH_FILTER if cfg else ".mp4").lower()
+            if not folder or not os.path.isdir(folder):
+                return {}
+            return {
+                f.lower(): os.path.getmtime(os.path.join(folder, f))
+                for f in os.listdir(folder)
+                if f.lower().endswith(filt)
+            }
+        except Exception:
+            return {}
+
+    def is_media_file_ready(self, file_path):
+        try:
+            size1 = os.path.getsize(file_path)
+            time.sleep(cfg.WATCH_FILE_READY_CHECK_INTERVAL if cfg else 0.1)
+            size2 = os.path.getsize(file_path)
+            return size1 > 0 and size1 == size2
+        except Exception:
+            return False
+
+    def play_media_file(self, filepath):
+        try:
+            self.setup_vlc_player()
+            if not self.vlc_player or not self.vlc_instance:
+                return
+            media = self.vlc_instance.media_new(filepath)
+            self.vlc_player.set_media(media)
+            self.vlc_player.play()
+            time.sleep(cfg.WATCHER_VLC_DELAY_TO_START_PLAYING if cfg else 0.1)
+        except Exception:
+            pass
+
+    def media_watcher_loop(self):
+        if not VLC_AVAILABLE or not cfg:
+            return
+        try:
+            folder = cfg.WATCH_DIR
+            self.media_known_files = self.get_current_media_files()
+            while True:
+                current_files = self.get_current_media_files()
+                new_files = {f: m for f, m in current_files.items() if f not in self.media_known_files}
+                if new_files:
+                    self.media_last_activity = time.time()
+                    for filename, mtime in sorted(new_files.items(), key=lambda x: x[1]):
+                        filepath = os.path.join(folder, filename)
+                        if self.is_media_file_ready(filepath):
+                            self.play_media_file(filepath)
+                            time.sleep(cfg.WATCHER_VLC_DELAY_TO_START_PLAYING if cfg else 0.1)
+                            if self.vlc_player and self.vlc_player.is_playing():
+                                self.media_known_files[filename] = mtime
+                                while self.vlc_player.is_playing():
+                                    time.sleep(cfg.WATCHER_VLC_INTERVAL_TO_CHECK_IF_PLAYER_STILL_PLAYS if cfg else 0.1)
+                else:
+                    try:
+                        if cfg.CLOSE_AVATAR_IF_NEW_FILES_QUEUE_EMPTY:
+                            if self.vlc_player and (time.time() - self.media_last_activity >
+                                                    (cfg.TIME_INTERVAL_TO_DECIDE_THAT_NO_NEW_FILES_ARE_COMING)):
+                                if not self.vlc_player.is_playing():
+                                    self.close_vlc_player()
+                    except Exception:
+                        pass
+                time.sleep(1)
+        except Exception:
+            pass
+
+    def start_media_watcher(self):
+        try:
+            if VLC_AVAILABLE and cfg:
+                t = threading.Thread(target=self.media_watcher_loop, daemon=True)
+                t.start()
+        except Exception:
+            pass
 
     def on_size_selected(self, event):
         """When image size changes"""
@@ -762,6 +890,7 @@ class CameraLlamaApp:
         if self.cap:
             self.cap.release()
         self.session.close()
+        self.close_vlc_player()
         self.root.destroy()
 
 
