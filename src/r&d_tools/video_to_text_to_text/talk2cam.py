@@ -21,6 +21,9 @@ from tkinter import ttk, scrolledtext, messagebox
 from PIL import Image, ImageTk
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+import sys
+import subprocess
+import shutil
 try:
     import vlc
     import Kostya_demo_cfg_helper as cfg
@@ -102,6 +105,9 @@ class CameraLlamaApp:
         self.vlc_player = None
         self.media_known_files = {}
         self.media_last_activity = time.time()
+
+        # Avatar generation toggle
+        self.avatar_enabled = tk.BooleanVar(value=False)
 
         self.setup_ui()
         self.init_camera_threaded()
@@ -201,6 +207,9 @@ class CameraLlamaApp:
 
         self.settings_btn = ttk.Button(button_frame, text="⚙ Settings", command=self.toggle_settings, width=8)
         self.settings_btn.pack(side=tk.LEFT, padx=1)
+
+        self.avatar_check = ttk.Checkbutton(button_frame, text="Avatar", variable=self.avatar_enabled)
+        self.avatar_check.pack(side=tk.LEFT, padx=4)
 
         # Camera ID quick selector
         cam_frame = ttk.Frame(controls)
@@ -685,6 +694,9 @@ class CameraLlamaApp:
                     self.result_text.insert('1.0',
                                             f"[{timestamp}] ❌ {error}\n{'-' * 40}\n")
                 else:
+                    if response and self.avatar_enabled.get():
+                        threading.Thread(target=self.generate_avatar_from_text, args=(response,), daemon=True).start()
+
                     if response and len(response) > 300:
                         display_response = response[:300] + "..."
                     else:
@@ -884,6 +896,57 @@ class CameraLlamaApp:
                 ))
 
         threading.Thread(target=scan, daemon=True).start()
+
+    def generate_unique_name(self, prefix="var"):
+        ts = int(time.time() * 1000)
+        return f"{prefix}_{ts}"
+
+    def tts_generate_audio(self, text, hash_id):
+        try:
+            if getattr(cfg, "USE_EXISTING_AUDIO", False):
+                src = getattr(cfg, "EXISTING_AUDIO_SOURCE", None)
+                dst_dir = getattr(cfg, "AUDIO_DIR", getattr(cfg, "WATCH_DIR", "."))
+                if src and os.path.isfile(src):
+                    os.makedirs(dst_dir, exist_ok=True)
+                    dst = os.path.join(dst_dir, f"{hash_id}.ogg")
+                    shutil.copy(src, dst)
+                    return True
+            if getattr(cfg, "USE_GOOGLE_TTS", True):
+                lang = getattr(cfg, "DEFAULT_LANG", "en")
+                script_path = os.path.join(os.path.dirname(__file__), "text2speach_google.py")
+                proc = subprocess.Popen([sys.executable, script_path, text, hash_id, lang])
+                rc = proc.wait()
+                return rc == 0
+        except Exception:
+            return False
+        return False
+
+    def request_avatar_video(self, hash_id):
+        try:
+            url = getattr(cfg, "AVATAR_API_URL", "http://127.0.0.1:5005/v1/avatar/get-response")
+            avatar = getattr(cfg, "AVATAR_NAME", "avatar_painter_muze_9.mp4")
+            pads = getattr(cfg, "AVATAR_PADS", [0, 10, 0, 0])
+            payload = {"avatar": avatar, "pads": pads, "audio": f"{hash_id}.ogg"}
+            headers = {'Content-Type': 'application/json;charset=UTF-8', 'Accept': 'application/json, text/plain, */*'}
+            r = self.session.post(url, json=payload, headers=headers, timeout=15)
+            return r.status_code in (200, 202)
+        except Exception:
+            return False
+
+    def generate_avatar_from_text(self, text):
+        try:
+            hash_id = self.generate_unique_name()
+            ok = self.tts_generate_audio(text, hash_id)
+            if not ok:
+                self.result_text.insert('1.0', f"[{datetime.now().strftime('%H:%M:%S')}] ⚠️ TTS failed\n{'-' * 40}\n")
+                return
+            ok2 = self.request_avatar_video(hash_id)
+            if ok2:
+                self.result_text.insert('1.0', f"[{datetime.now().strftime('%H:%M:%S')}] 🎬 Avatar requested: {hash_id}\n{'-' * 40}\n")
+            else:
+                self.result_text.insert('1.0', f"[{datetime.now().strftime('%H:%M:%S')}] ❌ Avatar request failed\n{'-' * 40}\n")
+        except Exception:
+            pass
 
     def on_closing(self):
         self.is_running = False
