@@ -20,12 +20,12 @@ USE_EDGE_TTS = False
 USE_RHVOICE_TTS = False
 USE_GDL_TTS = False
 
-DEFAULT_LANG = "ru"
+DEFAULT_LANG = "en"
 RHVOICE_VOICE = "vitaliy"
 GDL_VOICE = "MARIYA"
 
 # Edge TTS
-EDGE_TTS_VOICE = "ru-RU-SvetlanaNeural" #edge-tts --list-voices
+EDGE_TTS_VOICE = "en-US-EmmaNeural" #ru-RU-SvetlanaNeural edge-tts --list-voices
 EDGE_TTS_RATE = "+0%"
 EDGE_TTS_VOLUME = "+0%"
 EDGE_TTS_PITCH = "+0Hz"
@@ -36,3 +36,7 @@ AVATAR_PADS = [0, 10, 0, 0]
 
 AUDIO_DIR = WATCH_DIR
 EXISTING_AUDIO_SOURCE = r"C:\Users\aradz\PycharmProjects\avatar_fast\output_avatar_cow_girl_10.mp4.mp4-audio.ogg"
+
+# Idle media (проигрывать, пока нет новых файлов)
+IDLE_MEDIA_ENABLED = True
+IDLE_MEDIA_NAME = "matrix.mp4"#painter_muze.mp4

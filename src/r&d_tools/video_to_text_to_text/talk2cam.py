@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Camera Llama Analyzer - for /v1/chat/completions API format
+Camera Analyzer - for /v1/chat/completions API format
 With image resizing capability
 """
 
@@ -40,7 +40,7 @@ os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
 class CameraLlamaApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Camera Llama Analyzer")
+        self.root.title("Camera Analyzer")
         self.root.geometry("900x600")
 
         # Settings for API format
@@ -105,6 +105,7 @@ class CameraLlamaApp:
         self.vlc_player = None
         self.media_known_files = {}
         self.media_last_activity = time.time()
+        self.idle_playing = False
 
         # Avatar generation toggle
         self.avatar_enabled = tk.BooleanVar(value=False)
@@ -452,6 +453,28 @@ class CameraLlamaApp:
         except Exception:
             pass
 
+    def get_idle_media_path(self):
+        try:
+            name = getattr(cfg, "IDLE_MEDIA_NAME", "matrix.mp4")
+            base_dir = os.path.dirname(__file__)
+            if not base_dir or not name:
+                return None
+            path = os.path.join(base_dir, name)
+            return path if os.path.isfile(path) else None
+        except Exception:
+            return None
+
+    def play_idle_media(self):
+        try:
+            if not getattr(cfg, "IDLE_MEDIA_ENABLED", True):
+                return
+            idle_path = self.get_idle_media_path()
+            if idle_path:
+                self.play_media_file(idle_path)
+                self.idle_playing = True
+        except Exception:
+            pass
+
     def media_watcher_loop(self):
         if not VLC_AVAILABLE or not cfg:
             return
@@ -462,6 +485,12 @@ class CameraLlamaApp:
                 current_files = self.get_current_media_files()
                 new_files = {f: m for f, m in current_files.items() if f not in self.media_known_files}
                 if new_files:
+                    if self.idle_playing and self.vlc_player:
+                        try:
+                            self.vlc_player.stop()
+                        except Exception:
+                            pass
+                        self.idle_playing = False
                     self.media_last_activity = time.time()
                     for filename, mtime in sorted(new_files.items(), key=lambda x: x[1]):
                         filepath = os.path.join(folder, filename)
@@ -473,12 +502,17 @@ class CameraLlamaApp:
                                 while self.vlc_player.is_playing():
                                     time.sleep(cfg.WATCHER_VLC_INTERVAL_TO_CHECK_IF_PLAYER_STILL_PLAYS if cfg else 0.1)
                 else:
+                    # Idle playback: continuously play matrix.mp4 until a new file arrives
                     try:
-                        if cfg.CLOSE_AVATAR_IF_NEW_FILES_QUEUE_EMPTY:
-                            if self.vlc_player and (time.time() - self.media_last_activity >
-                                                    (cfg.TIME_INTERVAL_TO_DECIDE_THAT_NO_NEW_FILES_ARE_COMING)):
-                                if not self.vlc_player.is_playing():
-                                    self.close_vlc_player()
+                        if getattr(cfg, "IDLE_MEDIA_ENABLED", True):
+                            if not self.vlc_player or not self.vlc_player.is_playing():
+                                self.play_idle_media()
+                        else:
+                            if cfg.CLOSE_AVATAR_IF_NEW_FILES_QUEUE_EMPTY:
+                                if self.vlc_player and (time.time() - self.media_last_activity >
+                                                        (cfg.TIME_INTERVAL_TO_DECIDE_THAT_NO_NEW_FILES_ARE_COMING)):
+                                    if not self.vlc_player.is_playing():
+                                        self.close_vlc_player()
                     except Exception:
                         pass
                 time.sleep(1)
