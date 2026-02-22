@@ -255,20 +255,14 @@ class CameraLlamaApp:
                                                width=8)
         self.send_instruction_btn.grid(row=0, column=1, padx=(2, 0), pady=1)
 
-        # Options row: One-shot and Avatar
+        # Options row: Avatar
         self.options_frame = ttk.Frame(instruction_frame)
         self.options_frame.grid(row=2, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(2, 0))
-
-        self.one_shot_after_send = tk.BooleanVar(value=False)
-        self.one_shot_check = ttk.Checkbutton(self.options_frame,
-                                              text="One-shot on Send",
-                                              variable=self.one_shot_after_send)
-        self.one_shot_check.grid(row=0, column=0, padx=(0, 8), sticky=tk.W)
 
         self.avatar_check = ttk.Checkbutton(self.options_frame,
                                             text="Avatar",
                                             variable=self.avatar_enabled)
-        self.avatar_check.grid(row=0, column=1, sticky=tk.W)
+        self.avatar_check.grid(row=0, column=0, sticky=tk.W)
 
         # ========== SETTINGS PANEL (initially hidden) ==========
         self.settings_frame = ttk.LabelFrame(right_panel, text="⚙ Advanced Settings", padding="5")
@@ -353,10 +347,8 @@ class CameraLlamaApp:
         # Update status
         self.status_label.config(text=f"Instruction updated", foreground="green")
 
-        # Optional: Force immediate send of next frame with new instruction
-        if self.one_shot_after_send.get():
-            self.capture_snapshot()
-        elif self.is_running and self.current_frame is not None:
+        # Всегда отправлять один кадр после обновления инструкции
+        if self.current_frame is not None:
             thread = threading.Thread(
                 target=self.process_frame,
                 args=(self.current_frame.copy(),),
@@ -378,7 +370,7 @@ class CameraLlamaApp:
                 new_instruction = self.instruction_queue.get_nowait()
                 # Log instruction change
                 self.result_text.insert('1.0',
-                                        f"[{datetime.now().strftime('%H:%M:%S')}] 📝 Instruction changed to: '{new_instruction}'\n{'-' * 40}\n")
+                                        f"[{datetime.now().strftime('%H:%M:%S')}] 📝 Instruction: '{new_instruction}'\n{'-' * 40}\n")
         except Exception as e:
             print(f"Error processing instruction update: {e}")
 
@@ -743,16 +735,13 @@ class CameraLlamaApp:
                     self.result_text.insert('1.0',
                                             f"[{timestamp}] ❌ {error}\n{'-' * 40}\n")
                 else:
+                    if response.startswith('['):
+                        response = response.split(']', 1)[-1].lstrip()
                     if response and self.avatar_enabled.get():
-                        tts_text = response
-                        if tts_text.startswith('['):
-                            end_idx = tts_text.find(']')
-                            if end_idx != -1:
-                                tts_text = tts_text[end_idx + 1:].lstrip()
-                        threading.Thread(target=self.generate_avatar_from_text, args=(tts_text,), daemon=True).start()
+                        threading.Thread(target=self.generate_avatar_from_text, args=(response,), daemon=True).start()
 
-                    if response and len(response) > 300:
-                        display_response = response[:300] + "..."
+                    if response and len(response) > 500:
+                        display_response = response[:500] + "..."
                     else:
                         display_response = response if response else "Empty response"
 
@@ -830,6 +819,14 @@ class CameraLlamaApp:
     def capture_snapshot(self):
         """Manual snapshot"""
         if self.current_frame is not None and self.camera_ready:
+            try:
+                new_instruction = self.prompt_text.get('1.0', 'end-1c').strip()
+                if not new_instruction:
+                    new_instruction = "What do you see?"
+                self.current_instruction = new_instruction
+                self.instruction_queue.put(new_instruction)
+            except Exception:
+                pass
             thread = threading.Thread(
                 target=self.process_frame,
                 args=(self.current_frame.copy(),),

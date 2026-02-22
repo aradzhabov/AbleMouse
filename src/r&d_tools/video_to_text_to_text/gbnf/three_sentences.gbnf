@@ -1,0 +1,2 @@
+root     ::= sentence sentence sentence
+sentence ::= [^.!?\n]+ [.!?] [ \n]?
