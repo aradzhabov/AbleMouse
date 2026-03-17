@@ -1,4 +1,4 @@
-# AbleMouse
+# AbleMouse Ecosystem 
 
 > Русский | [Chinese](README.cn.md) | [English](README.md) | 🌍 Помогите с переводом! Сделаем проект доступным для всего мира.
 
