@@ -6,6 +6,7 @@ If you have any questions please contact to aradzhabov@gmail.com
 >
 
 ## TellMeCam
+🎞 **Video Demonstration :** [Watch on YouTube](https://youtube.com/shorts/SuuQiRc6GdI)👆
 
 >Experience AI-Vision Without Ever Taking Your Phone Out of Your Pocket
 
