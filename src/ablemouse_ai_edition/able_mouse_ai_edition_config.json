@@ -1,0 +1,38 @@
+{
+  "communication": {
+    "use_menu_system": false,
+    "menu_host": "localhost",
+    "menu_port": 12345
+  },
+  "main": {
+    "camera": 0,
+    "cam_mouse_control": false,
+    "display_fps": false,
+    "do_not_move_cursor_if_xy_move_within_threshold": false,
+    "skip_x_threshold": 0.001,
+    "skip_y_threshold": 0.001,
+    "nose_center": true,
+    "last_action_display_time": 3.0
+  },
+  "eye_and_mouth": {
+    "left_eye_close_time_threshold": 1.5,
+    "right_eye_right_click_time_threshold": 1.0,
+    "mouth_open_right_click_time_threshold": 1.0,
+    "mouth_open_menu_selection_threshold": 0.3,
+    "eye_switch_cooldown_duration": 1.0,
+    "right_eye_right_click_cooldown_duration": 1.0,
+    "mouth_right_click_cooldown_duration": 1.0,
+    "mouth_click_cooldown_duration": 0.5,
+    "mouth_menu_selection_cooldown_duration": 0.8,
+    "eye_close_threshold": 0.005,
+    "mouth_open_threshold": 0.004
+  },
+  "filtering": {
+    "filter_method": "smooth",
+    "smoothing_alpha": 0.5,
+    "move_threshold_pixels": 2,
+    "use_movement_threshold": true,
+    "use_median_filter": true,
+    "median_filter_window": 10
+  }
+}

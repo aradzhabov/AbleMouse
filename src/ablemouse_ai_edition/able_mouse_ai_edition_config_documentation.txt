@@ -1,0 +1,119 @@
+================================================================================
+CONFIGURATION DOCUMENTATION FOR config.json - AbleMouse AI edition
+================================================================================
+
+[SECTION: communication] - SERVER COMMUNICATION SETTINGS
+--------------------------------------------------------------------------------
+use_menu_system          : true/false - Enable integration with AbleMouse Beyond Switch
+                           If false - the program runs autonomously without menu
+
+menu_host                : "localhost" or IP address - Menu server address
+
+menu_port                : 12345 - Port for connecting to the menu server
+
+================================================================================
+[SECTION: main] - MAIN SETTINGS
+--------------------------------------------------------------------------------
+camera                   : 0 - Built-in camera
+                           1,2,... - External camera (device number)
+
+cam_mouse_control        : true/false - Enable/disable cursor control via camera
+
+display_fps              : true/false - Display FPS counter on screen
+                           (may slightly reduce performance)
+
+do_not_move_cursor_if_xy_move_within_threshold : true/false - Skip micro-movements
+                           If true - cursor does not move on very small movements
+
+skip_x_threshold         : 0.001 - Skip threshold on X axis (lower = more sensitive)
+
+skip_y_threshold         : 0.001 - Skip threshold on Y axis (lower = more sensitive)
+
+nose_center              : true/false - Center cursor by nose
+                           true - screen center corresponds to nose position
+                           false - nose is offset from center
+
+last_action_display_time : 3.0 - Time to display last action on screen (seconds)
+
+================================================================================
+[SECTION: eye_and_mouth] - EYE AND MOUTH TRACKING SETTINGS
+--------------------------------------------------------------------------------
+left_eye_close_time_threshold       : 1.5 - LEFT eye closure time for toggling
+                                      control mode (seconds)
+                                      Example: close left eye for 1.5 sec to
+                                      enable/disable cursor control
+
+right_eye_right_click_time_threshold : 1.0 - RIGHT eye closure time for right click
+                                      (seconds)
+
+mouth_open_right_click_time_threshold : 1.0 - Time to keep mouth open for right click
+                                        (seconds)
+
+mouth_open_menu_selection_threshold   : 0.3 - Mouth opening time for menu selection
+                                        (seconds)
+
+eye_switch_cooldown_duration          : 1.0 - Cooldown after mode switching (seconds)
+                                        Prevents accidental double switching
+
+right_eye_right_click_cooldown_duration : 1.0 - Cooldown after right eye right click
+                                         (seconds)
+
+mouth_right_click_cooldown_duration   : 1.0 - Cooldown after mouth right click (seconds)
+
+mouth_click_cooldown_duration         : 0.5 - Cooldown after regular mouth click (seconds)
+
+mouth_menu_selection_cooldown_duration : 0.8 - Cooldown after mouth menu selection (seconds)
+
+eye_close_threshold    : 0.005 - Threshold for detecting closed eye
+                         LOWER = more sensitive (eye more easily considered closed)
+                         HIGHER = less sensitive (need to close eye tighter)
+
+mouth_open_threshold   : 0.004 - Threshold for detecting open mouth
+                         LOWER = more sensitive (open mouth detected more easily)
+                         HIGHER = less sensitive (need to open mouth wider)
+
+================================================================================
+[SECTION: filtering] - FILTERING AND SMOOTHING SETTINGS
+--------------------------------------------------------------------------------
+filter_method           : "smooth" or "kalman" - Movement smoothing method
+                         "smooth" - exponential smoothing (recommended)
+                         "kalman" - Kalman filter (in development)
+
+smoothing_alpha         : 0.5 - Smoothing coefficient (for "smooth" method only)
+                         0.0 - maximum smoothing (very smooth but with delay)
+                         0.5 - medium smoothing (recommended)
+                         1.0 - no smoothing (maximum responsiveness but jittery)
+
+move_threshold_pixels   : 2 - Minimum movement in pixels to update cursor
+                         Lower = smoother movement but higher CPU load
+                         Higher = cursor less sensitive to micro-movements
+
+use_movement_threshold  : true/false - Enable/disable movement threshold
+
+use_median_filter       : true/false - Use median filter for noise suppression
+
+median_filter_window    : 10 - Median filter window size (number of frames)
+                         Higher = smoother but more delay
+
+================================================================================
+TUNING TIPS:
+================================================================================
+1. If cursor is too jittery:
+   - Increase smoothing_alpha (0.6-0.8)
+   - Increase median_filter_window (15-20)
+   - Increase move_threshold_pixels (3-5)
+
+2. If cursor responds too slowly:
+   - Decrease smoothing_alpha (0.3-0.4)
+   - Decrease median_filter_window (3-5)
+   - Set use_movement_threshold = false
+
+3. If eyes/mouth are not detected well:
+   - Decrease eye_close_threshold (0.003-0.004)
+   - Decrease mouth_open_threshold (0.002-0.003)
+
+4. If accidental activations occur:
+   - Increase *_cooldown_duration values
+   - Increase threshold values
+
+================================================================================

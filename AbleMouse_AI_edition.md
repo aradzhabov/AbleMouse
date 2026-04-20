@@ -27,8 +27,27 @@ A few notes on use and configuration:
 *   I recommend using an external webcam, as this allows for maximum comfort in screen positioning, especially for bedridden individuals.
     If you are using an external webcam, you need to set the `camera` parameter to a value other than 0 (usually this value is 1). The value 0 corresponds to the built-in camera in your laptop.
 
+
+All camera settings are located in `able_mouse_ai_edition_config.json` under the `"main"` section:
+
+```json
+"main": {
+    "camera": 0,
+    ...
+}   
+```
+
 *   `EYE_CLOSE_THRESHOLD` - Thresholds for determining closed eyes (distance between the upper and lower eyelashes).
     `MOUTH_OPEN_THRESHOLD` - Threshold for determining an open mouth (distance between the lips).
+ 
+```commandline
+"eye_and_mouth": {
+    "eye_close_threshold": 0.005,
+    "mouth_open_threshold": 0.004,
+    ...
+}
+
+```
 
 It is important to understand that these parameters greatly depend on the distance of the face from the camera and the camera itself. You also need to consider that, for example, when you tilt your head, the distance between the calculated points decreases due to projection. When you run the program, you can easily check its operation with your settings, as a window will open displaying each gesture. This window can also be used for training. The window will remain open while the program is running but can be hidden behind other applications. This does not affect the program's operation.
 
